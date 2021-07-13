@@ -13,8 +13,7 @@
     <hr class="sidebar-divider">
     <?php
     $role_id = $this->session->userdata('role_id');
-    ?>
-    <?php if ($role_id == 1) : ?>
+    if ($role_id == 1) : ?>
 
 
         <li class="nav-item">
@@ -23,19 +22,14 @@
                 <span>Dashboard</span></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('admin/catatan'); ?>">
+            <a class="nav-link" href="<?= base_url('admin/penghutang'); ?>">
                 <i class="fas fa-fw fa-book-open"></i>
-                <span>Catatan Hutang</span></a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="<?= base_url('admin/lunas'); ?>">
-                <i class="fas fa-fw fa-handshake"></i>
-                <span>Hutang Lunas</span></a>
+                <span>Penghutang</span></a>
         </li>
         <li class="nav-item">
             <a class="nav-link" href="<?= base_url('admin/pesan'); ?>">
                 <i class="fas fa-fw fa-comments"></i>
-                <span>Fitur Pesan</span></a>
+                <span>Pesan</span></a>
         </li>
     <?php else : ?>
     <?php endif; ?>
@@ -50,24 +44,22 @@
             <span>Edit Profil</span></a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="<?= base_url('user/hutang'); ?>">
-            <i class="fas fa-fw fa-money-check-alt"></i>
-            <span>Hutang Aktif</span></a>
-    </li>
-    <li class="nav-item">
         <a class="nav-link" href="<?= base_url('user/gantipassword'); ?>">
             <i class="fas fa-fw fa-key"></i>
             <span>Ganti Password</span></a>
     </li>
     <?php
-    $role_id = $this->session->userdata('role_id');
-    ?>
-    <?php if ($role_id == 2) : ?>
-
+    if ($role_id == 2) : ?>
         <li class="nav-item">
             <a class="nav-link" href="<?= base_url('user/pesan'); ?>">
                 <i class="fas fa-fw fa-comments"></i>
-                <span>Fitur Pesan</span></a>
+                <span>Pesan</span></a>
+        </li>
+
+        <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('user/hutang'); ?>">
+                <i class="fas fa-fw fa-comments"></i>
+                <span>Hutang Saya</span></a>
         </li>
     <?php else : ?>
     <?php endif; ?>
