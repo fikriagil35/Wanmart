@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.2
+-- version 4.9.5deb2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Waktu pembuatan: 12 Jul 2021 pada 11.39
--- Versi server: 10.4.13-MariaDB
--- Versi PHP: 7.2.28
+-- Host: localhost:3306
+-- Generation Time: Jul 13, 2021 at 10:40 PM
+-- Server version: 8.0.25-0ubuntu0.20.04.1
+-- PHP Version: 7.4.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -24,19 +25,19 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `catatan`
+-- Table structure for table `catatan`
 --
 
 CREATE TABLE `catatan` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `nama_hutang` varchar(30) NOT NULL,
-  `jumlah_hutang` int(11) NOT NULL,
+  `jumlah_hutang` int NOT NULL,
   `tanggal_hutang` date NOT NULL,
   `tenggat_hutang` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data untuk tabel `catatan`
+-- Dumping data for table `catatan`
 --
 
 INSERT INTO `catatan` (`id`, `nama_hutang`, `jumlah_hutang`, `tanggal_hutang`, `tenggat_hutang`) VALUES
@@ -45,74 +46,111 @@ INSERT INTO `catatan` (`id`, `nama_hutang`, `jumlah_hutang`, `tanggal_hutang`, `
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `detail_pesan`
+-- Table structure for table `detail_hutang`
+--
+
+CREATE TABLE `detail_hutang` (
+  `id_detail_hutang` int NOT NULL,
+  `id_hutang` int NOT NULL,
+  `total_bayar` int NOT NULL,
+  `tanggal_bayar` date NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `detail_pesan`
 --
 
 CREATE TABLE `detail_pesan` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `pesan_id` int(11) NOT NULL,
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `pesan_id` int NOT NULL,
   `isi_balasan` text NOT NULL,
-  `tanggal` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `tanggal` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data untuk tabel `detail_pesan`
+-- Dumping data for table `detail_pesan`
 --
 
-INSERT INTO `detail_pesan` (`id`, `user_id`, `pesan_id`, `isi_balasan`, `tanggal`) VALUES
-(1, 4, 1, 'wqdqdqwdqwdqwdqwd', '2021-06-12 04:23:36'),
-(2, 4, 1, 'fdgergergergreg', '2021-06-12 04:23:39'),
-(3, 4, 1, 'hrthrthtrhtrhtr', '2021-06-12 04:23:43'),
-(4, 1, 1, 'wqdqwdwqdwq', '2021-06-12 04:24:00'),
-(5, 1, 1, 'gergregegergg', '2021-06-12 04:24:04'),
-(6, 1, 2, 'dasdsadsdsad', '2021-06-15 01:36:02'),
-(7, 1, 2, 'wefesfgerg', '2021-06-15 01:36:07'),
-(8, 1, 2, 'awdawdaw', '2021-06-15 01:36:10'),
-(9, 1, 3, 'oke check\r\n', '2021-07-11 10:03:07');
+INSERT INTO `detail_pesan` (`id`, `user_id`, `pesan_id`, `isi_balasan`) VALUES
+(1, 4, 1, 'wqdqdqwdqwdqwdqwd'),
+(2, 4, 1, 'fdgergergergreg'),
+(3, 4, 1, 'hrthrthtrhtrhtr'),
+(4, 1, 1, 'wqdqwdwqdwq'),
+(5, 1, 1, 'gergregegergg'),
+(6, 1, 2, 'dasdsadsdsad'),
+(7, 1, 2, 'wefesfgerg'),
+(8, 1, 2, 'awdawdaw'),
+(9, 1, 3, 'oke check\r\n');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `pesan`
+-- Table structure for table `hutang`
+--
+
+CREATE TABLE `hutang` (
+  `id_hutang` int NOT NULL,
+  `id_user` int NOT NULL,
+  `nama_hutang` varchar(50) NOT NULL,
+  `keterangan_hutang` varchar(256) NOT NULL,
+  `jumlah_hutang` int NOT NULL,
+  `tanggal_hutang` date NOT NULL,
+  `tenggat_waktu_hutang` date NOT NULL,
+  `status` enum('Lunas','Sedang dicicil','Belum lunas') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `hutang`
+--
+
+INSERT INTO `hutang` (`id_hutang`, `id_user`, `nama_hutang`, `keterangan_hutang`, `jumlah_hutang`, `tanggal_hutang`, `tenggat_waktu_hutang`, `status`) VALUES
+(2, 4, 'Bejir', 'Ngotank koh wkwkkw', 120000, '2021-07-13', '2021-07-19', 'Belum lunas');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `pesan`
 --
 
 CREATE TABLE `pesan` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
+  `id` int NOT NULL,
+  `user_id` int NOT NULL,
   `isi_pesan` text NOT NULL,
   `status` varchar(10) NOT NULL,
-  `tanggal` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `tanggal` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data untuk tabel `pesan`
+-- Dumping data for table `pesan`
 --
 
-INSERT INTO `pesan` (`id`, `user_id`, `isi_pesan`, `status`, `tanggal`) VALUES
-(1, 4, 'dqwdqwdqdqwdqw', 'Selesai', '2021-06-12 09:24:08'),
-(2, 4, 'tolol lu', 'Selesai', '2021-06-15 06:36:14'),
-(3, 5, 'test ke admin', 'Selesai', '2021-07-11 15:03:52');
+INSERT INTO `pesan` (`id`, `user_id`, `isi_pesan`, `status`) VALUES
+(1, 4, 'dqwdqwdqdqwdqw', 'Selesai'),
+(2, 4, 'tolol lu', 'Selesai'),
+(3, 5, 'test ke admin', 'Selesai');
 
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `user`
+-- Table structure for table `user`
 --
 
 CREATE TABLE `user` (
-  `id` int(11) NOT NULL,
+  `id` int NOT NULL,
   `name` varchar(30) NOT NULL,
   `email` varchar(30) NOT NULL,
   `image` varchar(30) NOT NULL,
   `password` varchar(60) NOT NULL,
-  `role_id` int(11) NOT NULL,
-  `is_active` int(1) NOT NULL,
-  `date_created` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `role_id` int NOT NULL,
+  `is_active` int NOT NULL,
+  `date_created` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Dumping data untuk tabel `user`
+-- Dumping data for table `user`
 --
 
 INSERT INTO `user` (`id`, `name`, `email`, `image`, `password`, `role_id`, `is_active`, `date_created`) VALUES
@@ -125,56 +163,80 @@ INSERT INTO `user` (`id`, `name`, `email`, `image`, `password`, `role_id`, `is_a
 --
 
 --
--- Indeks untuk tabel `catatan`
+-- Indexes for table `catatan`
 --
 ALTER TABLE `catatan`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `detail_pesan`
+-- Indexes for table `detail_hutang`
+--
+ALTER TABLE `detail_hutang`
+  ADD PRIMARY KEY (`id_detail_hutang`);
+
+--
+-- Indexes for table `detail_pesan`
 --
 ALTER TABLE `detail_pesan`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `pesan`
+-- Indexes for table `hutang`
+--
+ALTER TABLE `hutang`
+  ADD PRIMARY KEY (`id_hutang`);
+
+--
+-- Indexes for table `pesan`
 --
 ALTER TABLE `pesan`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeks untuk tabel `user`
+-- Indexes for table `user`
 --
 ALTER TABLE `user`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT untuk tabel yang dibuang
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT untuk tabel `catatan`
+-- AUTO_INCREMENT for table `catatan`
 --
 ALTER TABLE `catatan`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
--- AUTO_INCREMENT untuk tabel `detail_pesan`
+-- AUTO_INCREMENT for table `detail_hutang`
+--
+ALTER TABLE `detail_hutang`
+  MODIFY `id_detail_hutang` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `detail_pesan`
 --
 ALTER TABLE `detail_pesan`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT untuk tabel `pesan`
+-- AUTO_INCREMENT for table `hutang`
+--
+ALTER TABLE `hutang`
+  MODIFY `id_hutang` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `pesan`
 --
 ALTER TABLE `pesan`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT untuk tabel `user`
+-- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
