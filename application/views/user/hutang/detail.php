@@ -7,6 +7,10 @@
         <div class="card-body">
             <table class="table table-striped">
                 <tr>
+                    <th width="30%"><strong>Nama</strong></th>
+                    <td><?php echo $hutang['nama_hutang']; ?></td>
+                </tr>
+                <tr>
                     <th width="30%"><strong>Keterangan</strong></th>
                     <td><?php echo $hutang['keterangan_hutang']; ?></td>
                 </tr>
