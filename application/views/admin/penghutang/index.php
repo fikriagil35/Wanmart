@@ -27,7 +27,6 @@
                                 <td class="text-right">
                                     <div class="btn-group" role="group" aria-label="Aksi">
                                         <a href="<?= base_url('admin/penghutang/' . $dp['id']) ?>" class="btn btn-primary">Detail</a>
-                                        <button type="button" class="btn btn-danger">Hapus</button>
                                     </div>
                                 </td>
                             </tr>
