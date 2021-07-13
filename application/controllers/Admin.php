@@ -81,6 +81,237 @@ class admin extends CI_Controller
             Akses Anda Telah Berubah!
           </div>');
     }
+
+    public function penghutang($id = NULL)
+    {
+        $this->load->model('penghutang_model');
+
+        // Jika tidak ada ID User
+        if ($id == NULL) {
+            $user = $this->db->get_where('user', ['email' =>
+            $this->session->userdata('email')])->row_array();
+            $dataPenghutang = $this->penghutang_model->ambil_semua_data_penghutang();
+            $data = [
+                'title' => 'Penghutang',
+                'user' => $user,
+                'dataPenghutang' => $dataPenghutang
+            ];
+
+            $this->load->view('templates/header', $data);
+            $this->load->view('templates/sidebar', $data);
+            $this->load->view('templates/topbar', $data);
+            $this->load->view('admin/penghutang/index', $data);
+            $this->load->view('templates/footer');
+        } else {
+            $user = $this->db->get_where('user', ['email' =>
+            $this->session->userdata('email')])->row_array();
+            $dataPenghutang = $this->penghutang_model->ambil_satu_penghutang($id);
+            $hutangAktif = $this->penghutang_model->hutang_aktif($id);
+
+            $data = [
+                'title' => 'Penghutang',
+                'user' => $user,
+                'dataPenghutang' => $dataPenghutang,
+                'hutangAktif' => $hutangAktif
+            ];
+            $this->load->view('templates/header', $data);
+            $this->load->view('templates/sidebar', $data);
+            $this->load->view('templates/topbar', $data);
+            $this->load->view('admin/penghutang/detail', $data);
+            $this->load->view('templates/footer');
+        }
+    }
+
+    public function tambahHutang()
+    {
+        $this->load->model('penghutang_model');
+
+        $id_user = $this->input->post('id_user');
+        $data = [
+            'id_user' => $id_user,
+            'nama_hutang' => $this->input->post('nama_hutang'),
+            'keterangan_hutang' => $this->input->post('keterangan_hutang'),
+            'jumlah_hutang' => $this->input->post('jumlah_hutang'),
+            'tanggal_hutang' => $this->input->post('tanggal_hutang'),
+            'tenggat_waktu_hutang' => $this->input->post('tenggat_waktu_hutang'),
+            'status' => 'Belum lunas'
+        ];
+
+        $proses = $this->penghutang_model->tambah_hutang($data);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menambahkan hutang!</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal menambahkan hutang!</div>');
+        }
+
+        redirect('admin/penghutang/' . $id_user);
+    }
+
+    public function hapusHutang($id_hutang)
+    {
+        $this->load->model('penghutang_model');
+
+        $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
+        $id_user = $hutang['id_user'];
+
+        $proses = $this->penghutang_model->hapus_hutang($id_hutang);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menghapus hutang!</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal menghapus hutang!</div>');
+        }
+
+        redirect('admin/penghutang/' . $id_user);
+    }
+
+    public function detailHutang($id_hutang)
+    {
+        $this->load->model('penghutang_model');
+
+        $user = $this->db->get_where('user', ['email' =>
+        $this->session->userdata('email')])->row_array();
+
+        $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
+        $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
+
+        $data = [
+            'title' => 'Detail Hutang',
+            'user' => $user,
+            'hutang' => $hutang,
+            'detailHutang' => $detailHutang
+        ];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('templates/sidebar', $data);
+        $this->load->view('templates/topbar', $data);
+        $this->load->view('admin/penghutang/detail_hutang', $data);
+        $this->load->view('templates/footer');
+    }
+
+    public function tambahDetailHutang()
+    {
+        $this->load->model('penghutang_model');
+
+        $id_hutang = $this->input->post('id_hutang');
+        $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
+        $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
+        $jumlahBayar = count($detailHutang);
+
+        // Jika sebelumnya pernah bayar hutang atau lagi nyicil
+        if ($jumlahBayar > 0) {
+            $totalDibayar = 0;
+
+            // Hitung total hutang yang udah dibayar
+            foreach ($detailHutang as $dh):
+                $totalDibayar += $dh['total_bayar'];
+            endforeach;
+
+            $dataDetailHutang = [
+                'id_hutang' => $id_hutang,
+                'total_bayar' => $this->input->post('total_bayar'),
+                'tanggal_bayar' => $this->input->post('tanggal_bayar')
+            ];
+
+            $proses = $this->penghutang_model->tambah_detail_hutang($dataDetailHutang);
+
+            if ($proses) {
+                // Jika total dibayar udah sama kek jumlah hutang, maka update status hutang jadi lunas
+                if ($totalDibayar >= $hutang['jumlah_hutang']) {
+                    $data = [
+                        'status' => 'Lunas'
+                    ];
+
+                    $this->penghutang_model->update_hutang($id_hutang, $data);
+                }
+            }
+
+        } else {
+            // Jika belum pernah bayar hutang
+            $totalDibayar = $this->input->post('total_bayar');
+            $dataDetailHutang = [
+                'id_hutang' => $id_hutang,
+                'total_bayar' => $totalDibayar,
+                'tanggal_bayar' => $this->input->post('tanggal_bayar')
+            ];
+
+            $proses = $this->penghutang_model->tambah_detail_hutang($dataDetailHutang);
+
+            if ($totalDibayar >= $hutang['jumlah_hutang']) {
+                $data = [
+                    'status' => 'Lunas'
+                ];
+            } else {
+                $data = [
+                    'status' => 'Sedang dicicil'
+                ];
+            }
+
+            $this->penghutang_model->update_hutang($id_hutang, $data);
+        }
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menambahkan bayaran hutang!</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal menambahkan bayaran hutang!</div>');
+        }
+
+        redirect('admin/detailHutang/' . $id_hutang);
+
+    }
+
+    public function hapus_detail_hutang($id_detail_hutang)
+    {
+        $this->load->model('penghutang_model');
+
+        // Ambil data hutangnya dulu
+        $satuDetailHutang = $this->penghutang_model->ambil_satu_detail_hutang($id_detail_hutang);
+        $id_hutang = $satuDetailHutang['id_hutang'];
+        $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
+        
+        // Hapus detail hutang
+        $proses = $this->penghutang_model->hapus_detail_hutang($id_detail_hutang);
+        
+        $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
+        $jumlahBayar = count($detailHutang);
+
+        // Ganti status transaksi
+        if ($jumlahBayar == 0) {
+            $data = [
+                'status' => 'Belum lunas'
+            ];
+        } else {
+            $totalDibayar = 0;
+
+            // Hitung total hutang yang udah dibayar
+            foreach ($detailHutang as $dh):
+                $totalDibayar += $dh['total_bayar'];
+            endforeach;
+
+            if ($totalDibayar >= $hutang['jumlah_hutang']) {
+                $data = [
+                    'status' => 'Lunas'
+                ];
+            } else {
+                $data = [
+                    'status' => 'Sedang dicicil'
+                ];
+            }   
+        }
+
+        $this->penghutang_model->update_hutang($id_hutang, $data);
+
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menghapus bayaran hutang!</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal menghapus bayaran hutang!</div>');
+        }
+
+        redirect('admin/detailHutang/' . $id_hutang);
+    }
+
     public function catatan()
     {
         $data['title'] = 'Catatan';
