@@ -22,18 +22,44 @@ class user extends CI_Controller
         $this->load->view('templates/footer');
     }
 
-    public function hutang()
+    public function hutang($id_hutang = NULL)
     {
-        $data['title'] = 'Hutang Aktif';
-        $data['user'] = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
-        $data['datahutang'] = $this->db->get('catatan')->result_array();
+        $this->load->model('penghutang_model');
 
-        $this->load->view('templates/header', $data);
-        $this->load->view('templates/sidebar', $data);
-        $this->load->view('templates/topbar', $data);
-        $this->load->view('user/hutang', $data);
-        $this->load->view('templates/footer');
+        $user = $this->db->get_where('user', ['email' =>
+        $this->session->userdata('email')])->row_array();
+
+        if ($id_hutang == NULL) {
+            $hutangAktif = $this->penghutang_model->hutang_aktif($user['id']);
+
+            $data = [
+                'title' => 'Hutang Saya',
+                'user' => $user,
+                'hutangAktif' => $hutangAktif
+            ];
+
+            $this->load->view('templates/header', $data);
+            $this->load->view('templates/sidebar', $data);
+            $this->load->view('templates/topbar', $data);
+            $this->load->view('user/hutang/index', $data);
+            $this->load->view('templates/footer');
+        } else {
+            $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
+            $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
+
+            $data = [
+                'title' => 'Detail Hutang',
+                'user' => $user,
+                'hutang' => $hutang,
+                'detailHutang' => $detailHutang
+            ];
+
+            $this->load->view('templates/header', $data);
+            $this->load->view('templates/sidebar', $data);
+            $this->load->view('templates/topbar', $data);
+            $this->load->view('user/hutang/detail', $data);
+            $this->load->view('templates/footer');
+        }
     }
 
 
