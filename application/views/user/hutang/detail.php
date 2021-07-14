@@ -45,7 +45,6 @@
                             <th scope="col">No</th>
                             <th scope="col">Total</th>
                             <th scope="col">Tanggal</th>
-                            <th scope="col">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,9 +57,6 @@
                                 <td><?= $no++ ?></td>
                                 <td><?= $dh['total_bayar'] ?></td>
                                 <td><?= $dh['tanggal_bayar'] ?></td>
-                                <td class="text-right">
-                                    <a href="<?= base_url('admin/hapus_detail_hutang/' . $dh['id_detail_hutang']) ?>" onclick="return confirm('Apakah kamu yakin ingin menghapus?');" class="btn btn-danger">Hapus</a>
-                                </td>
                             </tr>
                         <?php
                         endforeach;
