@@ -47,9 +47,14 @@
     <h1 class="h3 mb-4 text-gray-800">Riwayat Bayar Hutang</h1>
 
     <div class="card shadow mb-4">
-        <div class="card-header">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tambahModal">Tambah Bayar</button>
-        </div>
+        <?php
+        // Tampilkan tombol tambah bayar jika hutang belum lunas
+        if ($hutang['status'] != "Lunas") {
+        ?>
+            <div class="card-header">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tambahModal">Tambah Bayar</button>
+            </div>
+        <?php } ?>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="tabel-data-hutang" width="100%" cellspacing="0">
@@ -72,7 +77,15 @@
                                 <td><?= $dh['total_bayar'] ?></td>
                                 <td><?= $dh['tanggal_bayar'] ?></td>
                                 <td class="text-right">
-                                    <a href="<?= base_url('admin/hapus_detail_hutang/' . $dh['id_detail_hutang']) ?>" onclick="return confirm('Apakah kamu yakin ingin menghapus?');" class="btn btn-danger">Hapus</a>
+                                    <?php
+                                    // Tampilkan tombol tambah bayar jika hutang belum lunas
+                                    if ($hutang['status'] != "Lunas") {
+                                    ?>
+                                        <a href="<?= base_url('admin/hapus_detail_hutang/' . $dh['id_detail_hutang']) ?>" onclick="return confirm('Apakah kamu yakin ingin menghapus?');" class="btn btn-danger">Hapus</a>
+                                        <?php } else { ?>
+                                            <button type="button" class="btn btn-danger" disabled>Hapus</button>
+                                    <?php } ?>
+
                                 </td>
                             </tr>
                         <?php
