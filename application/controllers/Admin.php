@@ -82,6 +82,7 @@ class admin extends CI_Controller
           </div>');
     }
 
+    // Hutang
     public function penghutang($id = NULL)
     {
         $this->load->model('penghutang_model');
@@ -311,67 +312,6 @@ class admin extends CI_Controller
 
         redirect('admin/detailHutang/' . $id_hutang);
     }
-
-    public function catatan()
-    {
-        $data['title'] = 'Catatan';
-        $data['user'] = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
-        $data['data_user'] = $this->db->get('user')->result_array();
-        $this->form_validation->set_rules('nama', 'Nama', 'required');
-        $this->form_validation->set_rules('hutang', 'Hutang', 'required');
-        if ($this->form_validation->run() == false) {
-            $this->load->view('templates/header', $data);
-            $this->load->view('templates/sidebar', $data);
-            $this->load->view('templates/topbar', $data);
-            $this->load->view('admin/catatan', $data);
-            $this->load->view('templates/footer');
-        } else {
-            $tanggalHoetanq = date("y/m/d"); // Tanggal hari ini
-            $data = [
-                'nama_hutang' => $this->input->post('nama'),
-                'jumlah_hutang' => $this->input->post('hutang'),
-                'tanggal_hutang' => $tanggalHoetanq,
-                'tenggat_hutang' => $this->input->post('tenggat_hutang')
-            ];
-            if (!preg_match("/^[a-zA-Z ]*$/", $data['nama_hutang'])) {
-                $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">
-                Angka tidak diizinkan!</div>');
-                redirect('admin/catatan');
-            } else {
-            }
-            $this->db->insert('catatan', $data);
-            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">
-            Selamat! Data Hutang Berhasil Dimasukkan!
-          </div>');
-            redirect('admin/catatan');
-        }
-    }
-
-    public function lunas()
-    {
-        $data['title'] = 'Hutang Lunas';
-        $data['user'] = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
-        $data['datahutang'] = $this->db->get('catatan')->result_array();
-
-
-        $data['data_user'] = $this->db->get('user')->result_array();
-        $this->load->view('templates/header', $data);
-        $this->load->view('templates/sidebar', $data);
-        $this->load->view('templates/topbar', $data);
-        $this->load->view('admin/lunas', $data);
-        $this->load->view('templates/footer');
-    }
-    public function hapus($id)
-    {
-        $this->db->where('id', $id);
-        $this->db->delete('catatan');
-        $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Hutang berhasil dihapus!</div>');
-        redirect('admin/lunas');
-    }
-
-
 
     // Pesan
     public function pesan()
