@@ -27,6 +27,14 @@ class Penghutang_model extends CI_Model
         return $this->db->get()->result_array();
     }
 
+    public function hutang_lunas($id_user)
+    {
+        $this->db->from('hutang')
+            ->where('id_user =', $id_user)
+            ->where('status', 'Lunas');
+        return $this->db->get()->result_array();
+    }
+
     public function tambah_hutang($data)
     {
         return $this->db->insert('hutang', $data);

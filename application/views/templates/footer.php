@@ -59,6 +59,7 @@
 
     $(document).ready(function() {
         $('#tabel-data-hutang').DataTable();
+        $('#tabel-hutang-lunas').DataTable();
     });
 </script>
 <script>

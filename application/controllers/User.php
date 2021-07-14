@@ -31,11 +31,13 @@ class user extends CI_Controller
 
         if ($id_hutang == NULL) {
             $hutangAktif = $this->penghutang_model->hutang_aktif($user['id']);
+            $hutangLunas = $this->penghutang_model->hutang_lunas($user['id']);
 
             $data = [
                 'title' => 'Hutang Saya',
                 'user' => $user,
-                'hutangAktif' => $hutangAktif
+                'hutangAktif' => $hutangAktif,
+                'hutangLunas' => $hutangLunas
             ];
 
             $this->load->view('templates/header', $data);

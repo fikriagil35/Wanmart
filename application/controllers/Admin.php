@@ -108,12 +108,14 @@ class admin extends CI_Controller
             $this->session->userdata('email')])->row_array();
             $dataPenghutang = $this->penghutang_model->ambil_satu_penghutang($id);
             $hutangAktif = $this->penghutang_model->hutang_aktif($id);
+            $hutangLunas = $this->penghutang_model->hutang_lunas($id);
 
             $data = [
                 'title' => 'Penghutang',
                 'user' => $user,
                 'dataPenghutang' => $dataPenghutang,
-                'hutangAktif' => $hutangAktif
+                'hutangAktif' => $hutangAktif,
+                'hutangLunas' => $hutangLunas
             ];
             $this->load->view('templates/header', $data);
             $this->load->view('templates/sidebar', $data);
