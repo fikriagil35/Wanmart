@@ -3,18 +3,22 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class admin extends CI_Controller
 {
+    private $user;
+
     public function __construct()
     {
         parent::__construct();
         cek_logged_in();
         is_admin();
+
+        $this->user = $this->db->get_where('user', ['email_user' =>
+        $this->session->userdata('email')])->row_array();
     }
 
     public function index()
     {
         $data['title'] = 'Dashboard';
-        $data['user'] = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->user;
 
 
         $data['data_user'] = $this->db->get('user')->result_array();
@@ -28,8 +32,7 @@ class admin extends CI_Controller
     public function role()
     {
         $data['title'] = 'Role';
-        $data['user'] = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->user;
 
         $data['role'] = $this->db->get('user_role')->result_array();
 
@@ -43,8 +46,7 @@ class admin extends CI_Controller
     public function roleAccess($role_id)
     {
         $data['title'] = 'Role Access';
-        $data['user'] = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->user;
 
         $data['role'] = $this->db->get_where('user_role', ['id' => $role_id])->row_array();
 
@@ -89,7 +91,7 @@ class admin extends CI_Controller
 
         // Jika tidak ada ID User
         if ($id == NULL) {
-            $user = $this->db->get_where('user', ['email' =>
+            $user = $this->db->get_where('user', ['email_user' =>
             $this->session->userdata('email')])->row_array();
             $dataPenghutang = $this->penghutang_model->ambil_semua_data_penghutang();
             $data = [
@@ -104,7 +106,7 @@ class admin extends CI_Controller
             $this->load->view('admin/penghutang/index', $data);
             $this->load->view('templates/footer');
         } else {
-            $user = $this->db->get_where('user', ['email' =>
+            $user = $this->db->get_where('user', ['email_user' =>
             $this->session->userdata('email')])->row_array();
             $dataPenghutang = $this->penghutang_model->ambil_satu_penghutang($id);
             $hutangAktif = $this->penghutang_model->hutang_aktif($id);
@@ -137,7 +139,7 @@ class admin extends CI_Controller
             'jumlah_hutang' => $this->input->post('jumlah_hutang'),
             'tanggal_hutang' => $this->input->post('tanggal_hutang'),
             'tenggat_waktu_hutang' => $this->input->post('tenggat_waktu_hutang'),
-            'status' => 'Belum lunas'
+            'status_hutang' => 'Belum lunas'
         ];
 
         $proses = $this->penghutang_model->tambah_hutang($data);
@@ -173,8 +175,7 @@ class admin extends CI_Controller
     {
         $this->load->model('penghutang_model');
 
-        $user = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
+        $user = $this->user;
 
         $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
         $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
@@ -207,14 +208,14 @@ class admin extends CI_Controller
             $totalDibayar = 0;
 
             // Hitung total hutang yang udah dibayar
-            foreach ($detailHutang as $dh):
-                $totalDibayar += $dh['total_bayar'];
+            foreach ($detailHutang as $dh) :
+                $totalDibayar += $dh['total_bayar_hutang'];
             endforeach;
 
             $dataDetailHutang = [
                 'id_hutang' => $id_hutang,
-                'total_bayar' => $this->input->post('total_bayar'),
-                'tanggal_bayar' => $this->input->post('tanggal_bayar')
+                'total_bayar_hutang' => $this->input->post('total_bayar'),
+                'tanggal_bayar_hutang' => $this->input->post('tanggal_bayar')
             ];
 
             $proses = $this->penghutang_model->tambah_detail_hutang($dataDetailHutang);
@@ -223,31 +224,30 @@ class admin extends CI_Controller
                 // Jika total dibayar udah sama kek jumlah hutang, maka update status hutang jadi lunas
                 if ($totalDibayar >= $hutang['jumlah_hutang']) {
                     $data = [
-                        'status' => 'Lunas'
+                        'status_hutang' => 'Lunas'
                     ];
 
                     $this->penghutang_model->update_hutang($id_hutang, $data);
                 }
             }
-
         } else {
             // Jika belum pernah bayar hutang
             $totalDibayar = $this->input->post('total_bayar');
             $dataDetailHutang = [
                 'id_hutang' => $id_hutang,
-                'total_bayar' => $totalDibayar,
-                'tanggal_bayar' => $this->input->post('tanggal_bayar')
+                'total_bayar_hutang' => $totalDibayar,
+                'tanggal_bayar_hutang' => $this->input->post('tanggal_bayar')
             ];
 
             $proses = $this->penghutang_model->tambah_detail_hutang($dataDetailHutang);
 
             if ($totalDibayar >= $hutang['jumlah_hutang']) {
                 $data = [
-                    'status' => 'Lunas'
+                    'status_hutang' => 'Lunas'
                 ];
             } else {
                 $data = [
-                    'status' => 'Sedang dicicil'
+                    'status_hutang' => 'Sedang dicicil'
                 ];
             }
 
@@ -261,7 +261,6 @@ class admin extends CI_Controller
         }
 
         redirect('admin/detailHutang/' . $id_hutang);
-
     }
 
     public function hapus_detail_hutang($id_detail_hutang)
@@ -272,35 +271,35 @@ class admin extends CI_Controller
         $satuDetailHutang = $this->penghutang_model->ambil_satu_detail_hutang($id_detail_hutang);
         $id_hutang = $satuDetailHutang['id_hutang'];
         $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
-        
+
         // Hapus detail hutang
         $proses = $this->penghutang_model->hapus_detail_hutang($id_detail_hutang);
-        
+
         $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
         $jumlahBayar = count($detailHutang);
 
         // Ganti status transaksi
         if ($jumlahBayar == 0) {
             $data = [
-                'status' => 'Belum lunas'
+                'status_hutang' => 'Belum lunas'
             ];
         } else {
             $totalDibayar = 0;
 
             // Hitung total hutang yang udah dibayar
-            foreach ($detailHutang as $dh):
-                $totalDibayar += $dh['total_bayar'];
+            foreach ($detailHutang as $dh) :
+                $totalDibayar += $dh['total_bayar_hutang'];
             endforeach;
 
             if ($totalDibayar >= $hutang['jumlah_hutang']) {
                 $data = [
-                    'status' => 'Lunas'
+                    'status_hutang' => 'Lunas'
                 ];
             } else {
                 $data = [
-                    'status' => 'Sedang dicicil'
+                    'status_hutang' => 'Sedang dicicil'
                 ];
-            }   
+            }
         }
 
         $this->penghutang_model->update_hutang($id_hutang, $data);
@@ -320,7 +319,7 @@ class admin extends CI_Controller
     {
         $this->load->model('pesan_model');
         $user =
-            $this->db->get_where('user', ['email' => $this->session->userdata('email')])->row_array();
+            $this->db->get_where('user', ['email_user' => $this->session->userdata('email')])->row_array();
 
         $data = [
             'title' => 'Pesan',
@@ -338,13 +337,12 @@ class admin extends CI_Controller
     public function tambahPesan()
     {
         $this->load->model('pesan_model');
-        $user =
-            $this->db->get_where('user', ['email' => $this->session->userdata('email')])->row_array();
+        $user = $this->user;
         $data = [
-            'user_id' => $user['id'],
+            'id_user' => $user['id_user'],
             'isi_pesan' => $this->input->post('isi_pesan'),
-            'status' => 'Open',
-            'tanggal' => date("Y-m-d H:i:s")
+            'status_pesan' => 'Open',
+            'tanggal_pesan' => date("Y-m-d H:i:s")
         ];
 
         $proses = $this->pesan_model->tambah_pesan($data);
@@ -362,7 +360,7 @@ class admin extends CI_Controller
     {
         $this->load->model('pesan_model');
         $user =
-            $this->db->get_where('user', ['email' => $this->session->userdata('email')])->row_array();
+            $this->db->get_where('user', ['email_user' => $this->session->userdata('email')])->row_array();
 
         $id = $this->uri->segment('3');
 
@@ -384,12 +382,12 @@ class admin extends CI_Controller
     {
         $this->load->model('pesan_model');
         $user =
-            $this->db->get_where('user', ['email' => $this->session->userdata('email')])->row_array();
+            $this->db->get_where('user', ['email_user' => $this->session->userdata('email')])->row_array();
         $data = [
-            'user_id' => $user['id'],
-            'pesan_id' => $this->input->post('pesan_id'),
-            'isi_balasan' => $this->input->post('isi_balasan'),
-            'tanggal' => date("Y-m-d H:i:s")
+            'id_user' => $user['id'],
+            'id_pesan' => $this->input->post('pesan_id'),
+            'balasan_pesan' => $this->input->post('isi_balasan'),
+            'tanggal_balasan_pesan' => date("Y-m-d H:i:s")
         ];
 
         $proses = $this->pesan_model->balas_pesan($data);
@@ -407,7 +405,7 @@ class admin extends CI_Controller
     {
         $this->load->model('pesan_model');
         $data = [
-            'status' => 'Selesai'
+            'status_pesan' => 'Selesai'
         ];
         $id = $this->input->post('pesan_id');
 

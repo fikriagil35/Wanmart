@@ -39,11 +39,11 @@
                                 <?php foreach ($data_user as $ds) : ?>
                                     <tr>
                                         <th scope="row"><?= $i; ?></th>
-                                        <td><?= $ds['name']; ?></td>
-                                        <td><?= $ds['email']; ?></td>
-                                        <td><?= date('d F Y', ($ds['date_created'])); ?></td>
+                                        <td><?= $ds['name_user']; ?></td>
+                                        <td><?= $ds['email_user']; ?></td>
+                                        <td><?= date('d F Y', ($ds['date_created_user'])); ?></td>
                                         <td>
-                                            <?php if ($ds['role_id'] == 1) : ?>
+                                            <?php if ($ds['role_id_user'] == 1) : ?>
                                                 <p>Admin</p>
                                             <?php else : ?>
                                                 <p>Pengguna</p>

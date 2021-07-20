@@ -10,7 +10,7 @@ class Pesan_model extends CI_Model
 
     public function ambil_semua_pesan_user($id)
     {
-        $this->db->where('user_id', $id);
+        $this->db->where('id_user', $id);
         return $this->db->get('pesan')->result_array();
     }
 
@@ -22,9 +22,9 @@ class Pesan_model extends CI_Model
     public function ambil_detail_pesan_user($id)
     {
         $this->db->from('pesan');
-        $this->db->join('user', 'user.id = pesan.user_id');
+        $this->db->join('user', 'user.id_user = pesan.id_user');
         $this->db->where(
-            'pesan.id',
+            'pesan.id_pesan',
             $id
         );
         return $this->db->get()->result_array();
@@ -37,13 +37,13 @@ class Pesan_model extends CI_Model
 
     public function detail_balasan_pesan($id)
     {
-        $this->db->join('user', 'user.id = detail_pesan.user_id');
-        return $this->db->get_where('detail_pesan', ['pesan_id' => $id])->result_array();
+        $this->db->join('user', 'user.id_user = detail_pesan.id_user');
+        return $this->db->get_where('detail_pesan', ['id_pesan' => $id])->result_array();
     }
 
     public function tutup_pesan($data, $id)
     {
-        $this->db->where('id', $id);
+        $this->db->where('id_pesan', $id);
         return $this->db->update('pesan', $data);
     }
 }

@@ -8,7 +8,7 @@
 
     <div class="card shadow mb-4">
         <div class="card-header py-3">
-            <?= $pesan[0]['name']; ?>
+            <?= $pesan[0]['name_user']; ?>
         </div>
         <div class="card-body">
             <?= $pesan[0]['isi_pesan']; ?>
@@ -19,15 +19,15 @@
     <?php foreach ($detailPesan as $dp) : ?>
         <div class="card shadow mb-4">
             <div class="card-header py-3">
-                <?= $dp['name']; ?>
+                <?= $dp['name_user']; ?>
             </div>
             <div class="card-body">
-                <?= $dp['isi_balasan']; ?>
+                <?= $dp['balasan_pesan']; ?>
             </div>
         </div>
     <?php endforeach; ?>
 
-    <?php if ($pesan[0]['status'] == 'Open') { ?>
+    <?php if ($pesan[0]['status_pesan'] == 'Open') { ?>
         <div class="card shadow mb-4">
             <form action="<?= base_url('user/balasPesan') ?>" method="POST">
                 <input type="hidden" name="pesan_id" value="<?= $this->uri->segment('3') ?>">

@@ -36,7 +36,7 @@
                                         <td><?= $dh['nama_hutang']; ?></td>
                                         <td>Rp. <?= $dh['jumlah_hutang']; ?>,-</td>
                                         <td><?= $dh['tanggal_hutang']; ?></td>
-                                        <td><?= $dh['tenggat_hutang']; ?></td>
+                                        <td><?= $dh['tenggat_waktu_hutang']; ?></td>
                                     </tr>
                                     <?php $i++; ?>
                                 <?php endforeach; ?>

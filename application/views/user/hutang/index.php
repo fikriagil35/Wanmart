@@ -30,7 +30,7 @@
                                 <td><?= $ha['nama_hutang'] ?></td>
                                 <td><?= $ha['keterangan_hutang'] ?></td>
                                 <td><?= $ha['jumlah_hutang'] ?></td>
-                                <td><?= $ha['status'] ?></td>
+                                <td><?= $ha['status_hutang'] ?></td>
                                 <td><?= $ha['tanggal_hutang'] ?></td>
                                 <td><?= $ha['tenggat_waktu_hutang'] ?></td>
                                 <td>
@@ -75,7 +75,7 @@
                                 <td><?= $hl['nama_hutang'] ?></td>
                                 <td><?= $hl['keterangan_hutang'] ?></td>
                                 <td><?= $hl['jumlah_hutang'] ?></td>
-                                <td><?= $hl['status'] ?></td>
+                                <td><?= $hl['status_hutang'] ?></td>
                                 <td><?= $hl['tanggal_hutang'] ?></td>
                                 <td><?= $hl['tenggat_waktu_hutang'] ?></td>
                                 <td>

@@ -22,11 +22,11 @@
                         ?>
                             <tr>
                                 <td><?= $no++; ?></td>
-                                <td><?= $dp['name']; ?></td>
-                                <td><?= $dp['email']; ?></td>
+                                <td><?= $dp['name_user']; ?></td>
+                                <td><?= $dp['email_user']; ?></td>
                                 <td class="text-right">
                                     <div class="btn-group" role="group" aria-label="Aksi">
-                                        <a href="<?= base_url('admin/penghutang/' . $dp['id']) ?>" class="btn btn-primary">Detail</a>
+                                        <a href="<?= base_url('admin/penghutang/' . $dp['id_user']) ?>" class="btn btn-primary">Detail</a>
                                     </div>
                                 </td>
                             </tr>

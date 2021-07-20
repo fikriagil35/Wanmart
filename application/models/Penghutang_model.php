@@ -6,14 +6,14 @@ class Penghutang_model extends CI_Model
     public function ambil_semua_data_penghutang()
     {
         $this->db->from('user')
-            ->where('role_id', 2);
+            ->where('role_id_user', 2);
         return $this->db->get()->result_array();
     }
 
     public function ambil_satu_penghutang($id_user)
     {
         $this->db->from('user')
-            ->where('id', $id_user);
+            ->where('id_user', $id_user);
         return $this->db->get()->row_array();
     }
 
@@ -23,7 +23,7 @@ class Penghutang_model extends CI_Model
 
         $this->db->from('hutang')
             ->where('id_user =', $id_user)
-            ->where_in('status', $statusHutangAktif);
+            ->where_in('status_hutang', $statusHutangAktif);
         return $this->db->get()->result_array();
     }
 
@@ -31,7 +31,7 @@ class Penghutang_model extends CI_Model
     {
         $this->db->from('hutang')
             ->where('id_user =', $id_user)
-            ->where('status', 'Lunas');
+            ->where('status_hutang', 'Lunas');
         return $this->db->get()->result_array();
     }
 
@@ -54,7 +54,7 @@ class Penghutang_model extends CI_Model
     public function ambil_info_hutang($id_hutang)
     {
         $this->db->from('hutang')
-            ->join('user', 'hutang.id_user = user.id', 'left')
+            ->join('user', 'hutang.id_user = user.id_user', 'left')
             ->where('hutang.id_hutang =', $id_hutang);
         return $this->db->get()->row_array();
     }

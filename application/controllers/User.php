@@ -3,17 +3,20 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class user extends CI_Controller
 {
+    private $user;
+
     public function __construct()
     {
         parent::__construct();
         cek_logged_in();
+        $this->user = $this->db->get_where('user', ['email_user' =>
+        $this->session->userdata('email')])->row_array();
     }
 
     public function index()
     {
         $data['title'] = 'Profil Saya';
-        $data['user'] = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->user;
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
@@ -26,12 +29,11 @@ class user extends CI_Controller
     {
         $this->load->model('penghutang_model');
 
-        $user = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
+        $user = $this->user;
 
         if ($id_hutang == NULL) {
-            $hutangAktif = $this->penghutang_model->hutang_aktif($user['id']);
-            $hutangLunas = $this->penghutang_model->hutang_lunas($user['id']);
+            $hutangAktif = $this->penghutang_model->hutang_aktif($user['id_user']);
+            $hutangLunas = $this->penghutang_model->hutang_lunas($user['id_user']);
 
             $data = [
                 'title' => 'Hutang Saya',
@@ -68,8 +70,7 @@ class user extends CI_Controller
     public function edit()
     {
         $data['title'] = 'Edit Profil';
-        $data['user'] = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->user;
 
         $this->form_validation->set_rules('name', 'Nama Panjang', 'required|trim');
 
@@ -94,20 +95,20 @@ class user extends CI_Controller
                 $this->load->library('upload', $config);
 
                 if ($this->upload->do_upload('image')) {
-                    $old_image = $data['user']['image'];
+                    $old_image = $data['user']['image_user'];
                     if ($old_image != 'default.jpg') {
                         unlink(FCPATH . 'asssets/img/profile/' . $old_image);
                     }
 
                     $new_image = $this->upload->data('file_name');
-                    $this->db->set('image', $new_image);
+                    $this->db->set('image_user', $new_image);
                 } else {
                     echo $this->upload->display_errors();
                 }
             }
 
-            $this->db->set('name', $name);
-            $this->db->where('email', $email);
+            $this->db->set('name_user', $name);
+            $this->db->where('email_user', $email);
             $this->db->update('user');
 
             $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">
@@ -120,8 +121,7 @@ class user extends CI_Controller
     public function gantiPassword()
     {
         $data['title'] = 'Ganti Password';
-        $data['user'] = $this->db->get_where('user', ['email' =>
-        $this->session->userdata('email')])->row_array();
+        $data['user'] = $this->user;
 
         $this->form_validation->set_rules('current_password', 'Password Saat Ini', 'required|trim');
         $this->form_validation->set_rules('new_password1', 'Password Baru', 'required|trim|min_length[3]|matches[new_password2]');
@@ -137,7 +137,7 @@ class user extends CI_Controller
         } else {
             $current_password = $this->input->post('current_password');
             $new_password = $this->input->post('new_password1');
-            if (!password_verify($current_password, $data['user']['password'])) {
+            if (!password_verify($current_password, $data['user']['password_user'])) {
                 $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert"> Password Saat Ini Salah!</div>');
                 redirect('user/gantipassword');
             } else {
@@ -148,8 +148,8 @@ class user extends CI_Controller
                     $password_hash = password_hash($new_password, PASSWORD_DEFAULT);
 
 
-                    $this->db->set('password', $password_hash);
-                    $this->db->where('email', $this->session->userdata('email'));
+                    $this->db->set('password_user', $password_hash);
+                    $this->db->where('email_user', $this->session->userdata('email'));
                     $this->db->update('user');
 
                     $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert"> Password Berhasil Diubah!</div>');
@@ -164,12 +164,12 @@ class user extends CI_Controller
     {
         $this->load->model('pesan_model');
         $user =
-            $this->db->get_where('user', ['email' => $this->session->userdata('email')])->row_array();
+            $this->user;
 
         $data = [
             'title' => 'Pesan',
             'user' => $user,
-            'pesan' =>  $this->pesan_model->ambil_semua_pesan_user($user['id'])
+            'pesan' =>  $this->pesan_model->ambil_semua_pesan_user($user['id_user'])
         ];
 
         $this->load->view('templates/header', $data);
@@ -183,12 +183,12 @@ class user extends CI_Controller
     {
         $this->load->model('pesan_model');
         $user =
-            $this->db->get_where('user', ['email' => $this->session->userdata('email')])->row_array();
+            $this->user;
         $data = [
-            'user_id' => $user['id'],
+            'id_user' => $user['id_user'],
             'isi_pesan' => $this->input->post('isi_pesan'),
-            'status' => 'Open',
-            'tanggal' => date("Y-m-d H:i:s")
+            'status_pesan' => 'Open',
+            'tanggal_pesan' => date("Y-m-d H:i:s")
         ];
 
         $proses = $this->pesan_model->tambah_pesan($data);
@@ -205,8 +205,7 @@ class user extends CI_Controller
     public function detailPesan()
     {
         $this->load->model('pesan_model');
-        $user =
-            $this->db->get_where('user', ['email' => $this->session->userdata('email')])->row_array();
+        $user = $this->user;
 
         $id = $this->uri->segment('3');
 
@@ -228,12 +227,12 @@ class user extends CI_Controller
     {
         $this->load->model('pesan_model');
         $user =
-            $this->db->get_where('user', ['email' => $this->session->userdata('email')])->row_array();
+            $this->user;
         $data = [
-            'user_id' => $user['id'],
-            'pesan_id' => $this->input->post('pesan_id'),
-            'isi_balasan' => $this->input->post('isi_balasan'),
-            'tanggal' => date("Y-m-d H:i:s")
+            'id_user' => $user['id_user'],
+            'id_pesan' => $this->input->post('pesan_id'),
+            'balasan_pesan' => $this->input->post('isi_balasan'),
+            'tanggal_balasan_pesan' => date("Y-m-d H:i:s")
         ];
 
         $proses = $this->pesan_model->balas_pesan($data);
@@ -251,7 +250,7 @@ class user extends CI_Controller
     {
         $this->load->model('pesan_model');
         $data = [
-            'status' => 'Selesai'
+            'status_pesan' => 'Selesai'
         ];
         $id = $this->input->post('pesan_id');
 

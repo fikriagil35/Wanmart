@@ -10,11 +10,11 @@
             <table class="table table-striped">
                 <tr>
                     <th width="30%"><strong>Nama</strong></th>
-                    <td><?php echo $dataPenghutang['name']; ?></td>
+                    <td><?php echo $dataPenghutang['name_user']; ?></td>
                 </tr>
                 <tr>
                     <th width="30%"><strong>Email</strong></th>
-                    <td><?php echo $dataPenghutang['email']; ?></td>
+                    <td><?php echo $dataPenghutang['email_user']; ?></td>
                 </tr>
             </table>
         </div>
@@ -52,7 +52,7 @@
                                 <td><?= $ha['nama_hutang'] ?></td>
                                 <td><?= $ha['keterangan_hutang'] ?></td>
                                 <td><?= $ha['jumlah_hutang'] ?></td>
-                                <td><?= $ha['status'] ?></td>
+                                <td><?= $ha['status_hutang'] ?></td>
                                 <td><?= $ha['tanggal_hutang'] ?></td>
                                 <td><?= $ha['tenggat_waktu_hutang'] ?></td>
                                 <td>
@@ -98,7 +98,7 @@
                                 <td><?= $hl['nama_hutang'] ?></td>
                                 <td><?= $hl['keterangan_hutang'] ?></td>
                                 <td><?= $hl['jumlah_hutang'] ?></td>
-                                <td><?= $hl['status'] ?></td>
+                                <td><?= $hl['status_hutang'] ?></td>
                                 <td><?= $hl['tanggal_hutang'] ?></td>
                                 <td><?= $hl['tenggat_waktu_hutang'] ?></td>
                                 <td>
@@ -127,7 +127,7 @@
                 </button>
             </div>
             <form action="<?= base_url('admin/tambahHutang'); ?>" method="POST">
-                <input type="hidden" name="id_user" value="<?= $dataPenghutang['id'] ?>">
+                <input type="hidden" name="id_user" value="<?= $dataPenghutang['id_user'] ?>">
                 <div class="modal-body">
                     <div class="form-group">
                         <label>Nama Hutang</label>

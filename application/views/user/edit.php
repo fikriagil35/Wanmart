@@ -12,13 +12,13 @@
             <div class="form-group row">
                 <label for="email" class="col-sm-2 col-form-label">Email</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="email" name="email" value="<?= $user['email']; ?>" readonly>
+                    <input type="text" class="form-control" id="email" name="email" value="<?= $user['email_user']; ?>" readonly>
                 </div>
             </div>
             <div class="form-group row">
                 <label for="name" class="col-sm-2 col-form-label">Nama Panjang</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" id="name" name="name" value="<?= $user['name']; ?>">
+                    <input type="text" class="form-control" id="name" name="name" value="<?= $user['name_user']; ?>">
                     <?= form_error('name', '<small class="text-danger pl-3">', '</small>'); ?>
                 </div>
             </div>
@@ -27,7 +27,7 @@
                 <div class="col-sm-10">
                     <div class="row">
                         <div class="col-sm-3">
-                            <img src="<?= base_url('assets/img/profile/') . $user['image']; ?>" class="img-thumbnail">
+                            <img src="<?= base_url('assets/img/profile/') . $user['image_user']; ?>" class="img-thumbnail">
                         </div>
                     </div>
                     <div class="col-sm-9">

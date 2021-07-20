@@ -40,10 +40,10 @@
                             <tr>
                                 <th scope="row"><?= $i; ?></th>
                                 <td><?= $p['isi_pesan']; ?></td>
-                                <td><?= $p['tanggal']; ?></td>
-                                <td><?= $p['status']; ?></td>
+                                <td><?= $p['tanggal_pesan']; ?></td>
+                                <td><?= $p['status_pesan']; ?></td>
                                 <td>
-                                    <a href="<?= base_url('user/detailPesan/' . $p['id']) ?>" class="btn btn-primary">Rincian</a>
+                                    <a href="<?= base_url('user/detailPesan/' . $p['id_pesan']) ?>" class="btn btn-primary">Rincian</a>
                                 </td>
                             </tr>
                             <?php $i++; ?>

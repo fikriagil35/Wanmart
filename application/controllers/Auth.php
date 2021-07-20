@@ -33,18 +33,18 @@ class Auth extends CI_Controller
         $email = $this->input->post('email');
         $password = $this->input->post('password');
 
-        $user = $this->db->get_where('user', ['email' => $email])->row_array();
+        $user = $this->db->get_where('user', ['email_user' => $email])->row_array();
 
         if ($user) {
-            if ($user['is_active'] == 1) {
+            if ($user['is_active_user'] == 1) {
 
-                if (password_verify($password, $user['password'])) {
+                if (password_verify($password, $user['password_user'])) {
                     $data = [
-                        'email' => $user['email'],
-                        'role_id' => $user['role_id']
+                        'email' => $user['email_user'],
+                        'role_id' => $user['role_id_user']
                     ];
                     $this->session->set_userdata($data);
-                    if ($user['role_id'] == 1) {
+                    if ($user['role_id_user'] == 1) {
                         redirect('admin');
                     } else {
                         redirect('user');
@@ -87,13 +87,13 @@ class Auth extends CI_Controller
             $this->load->view('templates/auth_footer');
         } else {
             $data = [
-                'name' => htmlspecialchars($this->input->post('name', true)),
-                'email' => htmlspecialchars($this->input->post('email', true)),
-                'image' => 'default.jpg',
-                'password' => password_hash($this->input->post('password1'), PASSWORD_DEFAULT),
-                'role_id' => 2,
-                'is_active' => 1,
-                'date_created' => time()
+                'name_user' => htmlspecialchars($this->input->post('name', true)),
+                'email_user' => htmlspecialchars($this->input->post('email', true)),
+                'image_user' => 'default.jpg',
+                'password_user' => password_hash($this->input->post('password1'), PASSWORD_DEFAULT),
+                'role_id_user' => 2,
+                'is_active_user' => 1,
+                'date_created_user' => time()
             ];
 
             $this->db->insert('user', $data);

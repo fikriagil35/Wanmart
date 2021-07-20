@@ -10,11 +10,11 @@
             <table class="table table-striped">
                 <tr>
                     <th width="30%"><strong>Nama</strong></th>
-                    <td><?php echo $hutang['name']; ?></td>
+                    <td><?php echo $hutang['name_user']; ?></td>
                 </tr>
                 <tr>
                     <th width="30%"><strong>Email</strong></th>
-                    <td><?php echo $hutang['email']; ?></td>
+                    <td><?php echo $hutang['email_user']; ?></td>
                 </tr>
                 <tr>
                     <th width="30%"><strong>Nama</strong></th>
@@ -38,7 +38,7 @@
                 </tr>
                 <tr>
                     <th width="30%"><strong>Status</strong></th>
-                    <td><?php echo $hutang['status']; ?></td>
+                    <td><?php echo $hutang['status_hutang']; ?></td>
                 </tr>
             </table>
         </div>
@@ -49,7 +49,7 @@
     <div class="card shadow mb-4">
         <?php
         // Tampilkan tombol tambah bayar jika hutang belum lunas
-        if ($hutang['status'] != "Lunas") {
+        if ($hutang['status_hutang'] != "Lunas") {
         ?>
             <div class="card-header">
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tambahModal">Tambah Bayar</button>
@@ -74,16 +74,16 @@
                         ?>
                             <tr>
                                 <td><?= $no++ ?></td>
-                                <td><?= $dh['total_bayar'] ?></td>
-                                <td><?= $dh['tanggal_bayar'] ?></td>
+                                <td><?= $dh['total_bayar_hutang'] ?></td>
+                                <td><?= $dh['tanggal_bayar_hutang'] ?></td>
                                 <td class="text-right">
                                     <?php
                                     // Tampilkan tombol tambah bayar jika hutang belum lunas
-                                    if ($hutang['status'] != "Lunas") {
+                                    if ($hutang['status_hutang'] != "Lunas") {
                                     ?>
                                         <a href="<?= base_url('admin/hapus_detail_hutang/' . $dh['id_detail_hutang']) ?>" onclick="return confirm('Apakah kamu yakin ingin menghapus?');" class="btn btn-danger">Hapus</a>
-                                        <?php } else { ?>
-                                            <button type="button" class="btn btn-danger" disabled>Hapus</button>
+                                    <?php } else { ?>
+                                        <button type="button" class="btn btn-danger" disabled>Hapus</button>
                                     <?php } ?>
 
                                 </td>

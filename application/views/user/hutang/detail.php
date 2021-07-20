@@ -28,7 +28,7 @@
                 </tr>
                 <tr>
                     <th width="30%"><strong>Status</strong></th>
-                    <td><?php echo $hutang['status']; ?></td>
+                    <td><?php echo $hutang['status_hutang']; ?></td>
                 </tr>
             </table>
         </div>
@@ -55,8 +55,8 @@
                         ?>
                             <tr>
                                 <td><?= $no++ ?></td>
-                                <td><?= $dh['total_bayar'] ?></td>
-                                <td><?= $dh['tanggal_bayar'] ?></td>
+                                <td><?= $dh['total_bayar_hutang'] ?></td>
+                                <td><?= $dh['tanggal_bayar_hutang'] ?></td>
                             </tr>
                         <?php
                         endforeach;
