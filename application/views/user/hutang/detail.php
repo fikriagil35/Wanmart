@@ -16,7 +16,7 @@
                 </tr>
                 <tr>
                     <th width="30%"><strong>Jumlah</strong></th>
-                    <td><?php echo $hutang['jumlah_hutang']; ?></td>
+                    <td>Rp<?php echo $hutang['jumlah_hutang']; ?>-,</td>
                 </tr>
                 <tr>
                     <th width="30%"><strong>Tanggal</strong></th>
@@ -55,7 +55,7 @@
                         ?>
                             <tr>
                                 <td><?= $no++ ?></td>
-                                <td><?= $dh['total_bayar_hutang'] ?></td>
+                                <td>Rp<?= $dh['total_bayar_hutang'] ?>-,</td>
                                 <td><?= $dh['tanggal_bayar_hutang'] ?></td>
                             </tr>
                         <?php
