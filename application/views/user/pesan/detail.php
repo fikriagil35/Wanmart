@@ -58,7 +58,7 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="<?= base_url('user/tutupPesan') ?>" method="POST">
+                <form action="<?= base_url('admin/tutupPesan') ?>" method="POST">
                     <input type="hidden" name="pesan_id" value="<?= $this->uri->segment('3') ?>">
                     <div class="modal-body">
                         Tutup pesan jika Anda merasa pesan ini sudah selesai.
