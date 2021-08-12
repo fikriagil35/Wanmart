@@ -80,4 +80,12 @@ class Penghutang_model extends CI_Model
     {
         return $this->db->delete('detail_hutang', ['id_detail_hutang' => $id_detail_hutang]);
     }
+
+    public function hutang_berdasarkan_tanggal($tanggal)
+    {
+        $statusHutang = ['Belum lunas', 'Sedang dicicil'];
+        $this->db->where('tenggat_waktu_hutang >=', $tanggal);
+        $this->db->where_in('status_hutang', $statusHutang);
+        return $this->db->get('hutang')->result_array();
+    }
 }

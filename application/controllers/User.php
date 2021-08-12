@@ -13,10 +13,26 @@ class user extends CI_Controller
         $this->session->userdata('email')])->row_array();
     }
 
+    public function cekHutangDeadline()
+    {
+        $this->load->model('penghutang_model');
+
+        $tanggal = date("Y-m-d", time() - 86400); // Hari ini - 1 hari.
+        $hutang = $this->penghutang_model->hutang_berdasarkan_tanggal($tanggal);
+        $noHutang = count($hutang);
+        if ($noHutang > 0) {
+            return "<div style='padding:15px;margin-bottom:20px;border:1px solid transparent;border-radius:4px' class='alert-danger'>
+                            Anda memiliki " . $noHutang . " jatuh tempo. Segera dibayar coeg.
+                            </div>
+            ";
+        }
+    }
+
     public function index()
     {
         $data['title'] = 'Profil Saya';
         $data['user'] = $this->user;
+        $data['notifHutang'] = $this->cekHutangDeadline();
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
