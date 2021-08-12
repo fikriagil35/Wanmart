@@ -27,13 +27,7 @@
                             <th scope="col">Opsi</th>
                         </tr>
                     </thead>
-                    <!--<tfoot>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Office</th>
-                                </tr>
-                            </tfoot>-->
+
                     <tbody>
                         <?php $i = 1; ?>
                         <?php foreach ($pesan as $p) : ?>

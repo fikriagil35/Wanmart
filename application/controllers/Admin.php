@@ -84,12 +84,10 @@ class admin extends CI_Controller
           </div>');
     }
 
-    // Hutang
     public function penghutang($id = NULL)
     {
         $this->load->model('penghutang_model');
 
-        // Jika tidak ada ID User
         if ($id == NULL) {
             $user = $this->db->get_where('user', ['email_user' =>
             $this->session->userdata('email')])->row_array();
@@ -203,11 +201,9 @@ class admin extends CI_Controller
         $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
         $jumlahBayar = count($detailHutang);
 
-        // Jika sebelumnya pernah bayar hutang atau lagi nyicil
         if ($jumlahBayar > 0) {
             $totalDibayar = 0;
 
-            // Hitung total hutang yang udah dibayar
             foreach ($detailHutang as $dh) :
                 $totalDibayar += $dh['total_bayar_hutang'];
             endforeach;
@@ -221,7 +217,6 @@ class admin extends CI_Controller
             $proses = $this->penghutang_model->tambah_detail_hutang($dataDetailHutang);
 
             if ($proses) {
-                // Jika total dibayar udah sama kek jumlah hutang, maka update status hutang jadi lunas
                 if ($totalDibayar >= $hutang['jumlah_hutang']) {
                     $data = [
                         'status_hutang' => 'Lunas'
@@ -231,7 +226,6 @@ class admin extends CI_Controller
                 }
             }
         } else {
-            // Jika belum pernah bayar hutang
             $totalDibayar = $this->input->post('total_bayar');
             $dataDetailHutang = [
                 'id_hutang' => $id_hutang,
@@ -267,18 +261,15 @@ class admin extends CI_Controller
     {
         $this->load->model('penghutang_model');
 
-        // Ambil data hutangnya dulu
         $satuDetailHutang = $this->penghutang_model->ambil_satu_detail_hutang($id_detail_hutang);
         $id_hutang = $satuDetailHutang['id_hutang'];
         $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
 
-        // Hapus detail hutang
         $proses = $this->penghutang_model->hapus_detail_hutang($id_detail_hutang);
 
         $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
         $jumlahBayar = count($detailHutang);
 
-        // Ganti status transaksi
         if ($jumlahBayar == 0) {
             $data = [
                 'status_hutang' => 'Belum lunas'
@@ -286,7 +277,6 @@ class admin extends CI_Controller
         } else {
             $totalDibayar = 0;
 
-            // Hitung total hutang yang udah dibayar
             foreach ($detailHutang as $dh) :
                 $totalDibayar += $dh['total_bayar_hutang'];
             endforeach;
@@ -314,7 +304,6 @@ class admin extends CI_Controller
         redirect('admin/detailHutang/' . $id_hutang);
     }
 
-    // Pesan
     public function pesan()
     {
         $this->load->model('pesan_model');

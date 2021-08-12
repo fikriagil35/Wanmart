@@ -159,7 +159,6 @@ class user extends CI_Controller
         }
     }
 
-    // Pesan
     public function pesan()
     {
         $this->load->model('pesan_model');

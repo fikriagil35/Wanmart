@@ -48,7 +48,7 @@
 
     <div class="card shadow mb-4">
         <?php
-        // Tampilkan tombol tambah bayar jika hutang belum lunas
+
         if ($hutang['status_hutang'] != "Lunas") {
         ?>
             <div class="card-header">
@@ -78,7 +78,7 @@
                                 <td><?= $dh['tanggal_bayar_hutang'] ?></td>
                                 <td class="text-right">
                                     <?php
-                                    // Tampilkan tombol tambah bayar jika hutang belum lunas
+
                                     if ($hutang['status_hutang'] != "Lunas") {
                                     ?>
                                         <a href="<?= base_url('admin/hapus_detail_hutang/' . $dh['id_detail_hutang']) ?>" onclick="return confirm('Apakah kamu yakin ingin menghapus?');" class="btn btn-danger">Hapus</a>
