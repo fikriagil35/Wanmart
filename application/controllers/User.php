@@ -16,9 +16,9 @@ class user extends CI_Controller
     public function cekHutangDeadline()
     {
         $this->load->model('penghutang_model');
-
+        $id_user = $this->user['id_user'];
         $tanggal = date("Y-m-d", time() - 86400); // Hari ini - 1 hari.
-        $hutang = $this->penghutang_model->hutang_berdasarkan_tanggal($tanggal);
+        $hutang = $this->penghutang_model->hutang_berdasarkan_tanggal($tanggal, $id_user);
         $noHutang = count($hutang);
         if ($noHutang > 0) {
             return "<div style='padding:15px;margin-bottom:20px;border:1px solid transparent;border-radius:4px' class='alert-danger'>
