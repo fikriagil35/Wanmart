@@ -22,7 +22,7 @@ class user extends CI_Controller
         $noHutang = count($hutang);
         if ($noHutang > 0) {
             return "<div style='padding:15px;margin-bottom:20px;border:1px solid transparent;border-radius:4px' class='alert-danger'>
-                            Anda memiliki " . $noHutang . " jatuh tempo. Segera dibayar coeg.
+                            Anda memiliki " . $noHutang . " hutang yang akan segera jatuh tempo. Harap segera dibayar!
                             </div>
             ";
         }
