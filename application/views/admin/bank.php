@@ -36,7 +36,7 @@
                                 <td><?= $db['rekening_bank']; ?></td>
                                 <td class="text-right">
                                     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#ubahModal-<?= $db['id_bank'] ?>">Ubah</button>
-                                    <button type="button" class="btn btn-danger">Hapus</button>
+                                    <a href="<?= base_url('admin/hapusBank/') . $db['id_bank'] ?>" onclick="return confirm('Apakah kamu yakin ingin menghapus data ini?')" class="btn btn-danger">Hapus</a>
                                 </td>
                             </tr>
                             <?php $i++; ?>

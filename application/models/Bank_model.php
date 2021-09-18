@@ -25,4 +25,9 @@ class Bank_model extends CI_Model
         $this->db->where('id_bank', $id);
         return $this->db->update('bank', $data);
     }
+
+    public function hapus_bank($id)
+    {
+        return $this->db->delete('bank', ['id_bank' => $id]);
+    }
 }

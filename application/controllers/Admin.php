@@ -469,4 +469,19 @@ class admin extends CI_Controller
 
         redirect('admin/bank');
     }
+
+    public function hapusBank($id)
+    {
+        $this->load->model('bank_model');
+        
+        $proses = $this->bank_model->hapus_bank($id);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menghapus bank.</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Bank gagal dihapus.</div>');
+        }
+
+        redirect('admin/bank');
+    }
 }
