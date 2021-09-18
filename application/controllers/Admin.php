@@ -307,28 +307,31 @@ class admin extends CI_Controller
     public function pesan()
     {
         $this->load->model('pesan_model');
+        $this->load->model('penghutang_model');
+
+        $dataPenghutang = $this->penghutang_model->ambil_semua_data_penghutang();
         $user =
             $this->db->get_where('user', ['email_user' => $this->session->userdata('email')])->row_array();
 
         $data = [
             'title' => 'Pesan',
             'user' => $user,
-            'pesan' =>  $this->pesan_model->ambil_semua_pesan()
+            'pesan' =>  $this->pesan_model->ambil_semua_pesan(),
+            'penghutang' => $dataPenghutang
         ];
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
         $this->load->view('templates/topbar', $data);
-        $this->load->view('user/pesan/index', $data);
+        $this->load->view('admin/pesan', $data);
         $this->load->view('templates/footer');
     }
 
     public function tambahPesan()
     {
         $this->load->model('pesan_model');
-        $user = $this->user;
         $data = [
-            'id_user' => $user['id_user'],
+            'id_user' => $this->input->post('id_user'),
             'isi_pesan' => $this->input->post('isi_pesan'),
             'status_pesan' => 'Open',
             'tanggal_pesan' => date("Y-m-d H:i:s")
