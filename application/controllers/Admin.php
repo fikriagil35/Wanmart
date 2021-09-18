@@ -310,8 +310,7 @@ class admin extends CI_Controller
         $this->load->model('penghutang_model');
 
         $dataPenghutang = $this->penghutang_model->ambil_semua_data_penghutang();
-        $user =
-            $this->db->get_where('user', ['email_user' => $this->session->userdata('email')])->row_array();
+        $user = $this->user;
 
         $data = [
             'title' => 'Pesan',
@@ -351,8 +350,7 @@ class admin extends CI_Controller
     public function detailPesan()
     {
         $this->load->model('pesan_model');
-        $user =
-            $this->db->get_where('user', ['email_user' => $this->session->userdata('email')])->row_array();
+        $user = $this->user;
 
         $id = $this->uri->segment('3');
 
@@ -373,8 +371,7 @@ class admin extends CI_Controller
     public function balasPesan()
     {
         $this->load->model('pesan_model');
-        $user =
-            $this->db->get_where('user', ['email_user' => $this->session->userdata('email')])->row_array();
+        $user = $this->user;
         $data = [
             'id_user' => $user['id'],
             'id_pesan' => $this->input->post('pesan_id'),
