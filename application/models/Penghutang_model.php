@@ -45,6 +45,12 @@ class Penghutang_model extends CI_Model
         $this->db->where('id_hutang', $id_hutang);
         return $this->db->update('hutang', $data);
     }
+    
+    public function ubah_detail_hutang($data, $id)
+    {
+        $this->db->where('id_detail_hutang', $id);
+        return $this->db->update('detail_hutang', $data);
+    }
 
     public function hapus_hutang($id_hutang)
     {
@@ -62,6 +68,7 @@ class Penghutang_model extends CI_Model
     public function ambil_detail_hutang($id_hutang)
     {
         $this->db->from('detail_hutang')
+            ->join('bukti_pembayaran', 'detail_hutang.id_pembayaran = bukti_pembayaran.id_pembayaran')
             ->where('detail_hutang.id_hutang =', $id_hutang);
         return $this->db->get()->result_array();
     }
