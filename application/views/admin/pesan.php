@@ -51,13 +51,21 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Tambah Pesan ke Admin</h5>
+                    <h5 class="modal-title">Tambah Pesan ke Penghutang</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <form action="<?= base_url('user/tambahPesan') ?>" method="POST">
+                <form action="<?= base_url('admin/tambahPesan') ?>" method="POST">
                     <div class="modal-body">
+                        <div class="form-group">
+                            <label>Penghutang</label>
+                            <select name="id_user" class="form-control">
+                                <?php foreach($penghutang as $p): ?>
+                                    <option value="<?= $p['id_user'] ?>"><?= $p['name_user'] ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label>Isi Pesan</label>
                             <textarea name="isi_pesan" id="" cols="30" rows="10" class="form-control"></textarea>

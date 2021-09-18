@@ -172,6 +172,7 @@ class admin extends CI_Controller
     public function detailHutang($id_hutang)
     {
         $this->load->model('penghutang_model');
+        $this->load->model('bank_model');
 
         $user = $this->user;
 
@@ -182,7 +183,8 @@ class admin extends CI_Controller
             'title' => 'Detail Hutang',
             'user' => $user,
             'hutang' => $hutang,
-            'detailHutang' => $detailHutang
+            'detailHutang' => $detailHutang,
+            'databank' => $this->bank_model->ambil_semua_data_bank()
         ];
 
         $this->load->view('templates/header', $data);
@@ -190,6 +192,90 @@ class admin extends CI_Controller
         $this->load->view('templates/topbar', $data);
         $this->load->view('admin/penghutang/detail_hutang', $data);
         $this->load->view('templates/footer');
+    }
+
+    public function perbaruiPembayaran()
+    {
+        $this->load->model('penghutang_model');
+        $this->load->model('pembayaran_model');
+
+        $id_hutang = $this->input->post('id_hutang');
+
+        $id_detail_hutang = $this->input->post('id_detail_hutang');
+        $satuDetailHutang = $this->penghutang_model->ambil_satu_detail_hutang($id_detail_hutang);
+
+        $id_pembayaran = $satuDetailHutang['id_pembayaran'];
+        $total_bayar = $satuDetailHutang['total_bayar_hutang'];
+
+        $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
+        $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
+        $jumlahBayar = count($detailHutang);
+
+        $statusPembayaran = [
+            'status_pembayaran' => $this->input->post('status_pembayaran')
+        ];
+
+        $this->pembayaran_model->ubah_pembayaran($statusPembayaran, $id_pembayaran);
+
+
+        if ($statusPembayaran['status_pembayaran'] == "Terverifikasi") {
+
+            if ($jumlahBayar > 0) {
+                $totalDibayar = 0;
+
+                foreach ($detailHutang as $dh) :
+                    $totalDibayar += $dh['total_bayar_hutang'];
+                endforeach;
+
+                $dataDetailHutang = [
+                    'id_hutang' => $id_hutang,
+                    'total_bayar_hutang' => $total_bayar
+                ];
+
+                $proses = $this->penghutang_model->ubah_detail_hutang($dataDetailHutang, $id_detail_hutang);
+
+                if ($proses) {
+                    if ($totalDibayar >= $hutang['jumlah_hutang']) {
+                        $data = [
+                            'status_hutang' => 'Lunas'
+                        ];
+
+                        $this->penghutang_model->update_hutang($id_hutang, $data);
+                    }
+                }
+            } else {
+                $totalDibayar = $total_bayar;
+                $dataDetailHutang = [
+                    'id_hutang' => $id_hutang,
+                    'total_bayar_hutang' => $totalDibayar,
+                    'tanggal_bayar_hutang' => $this->input->post('tanggal_bayar')
+                ];
+
+                $proses = $this->penghutang_model->tambah_detail_hutang($dataDetailHutang);
+
+                if ($totalDibayar >= $hutang['jumlah_hutang']) {
+                    $data = [
+                        'status_hutang' => 'Lunas'
+                    ];
+                } else {
+                    $data = [
+                        'status_hutang' => 'Sedang dicicil'
+                    ];
+                }
+
+                $this->penghutang_model->update_hutang($id_hutang, $data);
+            }
+            if ($proses) {
+                $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menyimpan bayaran hutang!</div>');
+            } else {
+                $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal menyimpan bayaran hutang!</div>');
+            }
+            redirect('admin/detailHutang/' . $id_hutang);
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menyimpan bayaran hutang!</div>');
+            redirect('admin/detailHutang/' . $id_hutang);
+        }
+
     }
 
     public function tambahDetailHutang()
@@ -307,28 +393,30 @@ class admin extends CI_Controller
     public function pesan()
     {
         $this->load->model('pesan_model');
-        $user =
-            $this->db->get_where('user', ['email_user' => $this->session->userdata('email')])->row_array();
+        $this->load->model('penghutang_model');
+
+        $dataPenghutang = $this->penghutang_model->ambil_semua_data_penghutang();
+        $user = $this->user;
 
         $data = [
             'title' => 'Pesan',
             'user' => $user,
-            'pesan' =>  $this->pesan_model->ambil_semua_pesan()
+            'pesan' =>  $this->pesan_model->ambil_semua_pesan(),
+            'penghutang' => $dataPenghutang
         ];
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
         $this->load->view('templates/topbar', $data);
-        $this->load->view('user/pesan/index', $data);
+        $this->load->view('admin/pesan', $data);
         $this->load->view('templates/footer');
     }
 
     public function tambahPesan()
     {
         $this->load->model('pesan_model');
-        $user = $this->user;
         $data = [
-            'id_user' => $user['id_user'],
+            'id_user' => $this->input->post('id_user'),
             'isi_pesan' => $this->input->post('isi_pesan'),
             'status_pesan' => 'Open',
             'tanggal_pesan' => date("Y-m-d H:i:s")
@@ -348,8 +436,7 @@ class admin extends CI_Controller
     public function detailPesan()
     {
         $this->load->model('pesan_model');
-        $user =
-            $this->db->get_where('user', ['email_user' => $this->session->userdata('email')])->row_array();
+        $user = $this->user;
 
         $id = $this->uri->segment('3');
 
@@ -370,8 +457,7 @@ class admin extends CI_Controller
     public function balasPesan()
     {
         $this->load->model('pesan_model');
-        $user =
-            $this->db->get_where('user', ['email_user' => $this->session->userdata('email')])->row_array();
+        $user = $this->user;
         $data = [
             'id_user' => $user['id'],
             'id_pesan' => $this->input->post('pesan_id'),
@@ -407,5 +493,81 @@ class admin extends CI_Controller
         }
 
         redirect('admin/pesan');
+    }
+
+    public function bank()
+    {
+        $this->load->model('bank_model');
+
+        $user = $this->user;
+
+        $data = [
+            'title' => 'Data Bank',
+            'user' => $user,
+            'databank' => $this->bank_model->ambil_semua_data_bank()
+        ];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('templates/sidebar', $data);
+        $this->load->view('templates/topbar', $data);
+        $this->load->view('admin/bank', $data);
+        $this->load->view('templates/footer');
+    }
+
+    public function tambahBank()
+    {
+        $this->load->model('bank_model');
+        $data = [
+            'nama_bank' => $this->input->post('nama_bank'),
+            'nama_pemilik_bank' => $this->input->post('nama_pemilik_bank'),
+            'rekening_bank' => $this->input->post('rekening_bank')
+        ];
+
+        $proses = $this->bank_model->tambah_bank($data);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menambahkan bank.</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Bank gagal ditambahkan.</div>');
+        }
+
+        redirect('admin/bank');
+    }
+
+    public function ubahBank()
+    {
+        $this->load->model('bank_model');
+        $data = [
+            'nama_bank' => $this->input->post('nama_bank'),
+            'nama_pemilik_bank' => $this->input->post('nama_pemilik_bank'),
+            'rekening_bank' => $this->input->post('rekening_bank')
+        ];
+
+        $id = $this->input->post('id');
+
+        $proses = $this->bank_model->ubah_bank($data, $id);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil mengubah bank.</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Bank gagal diubah.</div>');
+        }
+
+        redirect('admin/bank');
+    }
+
+    public function hapusBank($id)
+    {
+        $this->load->model('bank_model');
+
+        $proses = $this->bank_model->hapus_bank($id);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menghapus bank.</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Bank gagal dihapus.</div>');
+        }
+
+        redirect('admin/bank');
     }
 }

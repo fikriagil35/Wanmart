@@ -67,11 +67,14 @@ class user extends CI_Controller
             $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
             $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
 
+            $this->load->model('bank_model');
+
             $data = [
                 'title' => 'Detail Hutang',
                 'user' => $user,
                 'hutang' => $hutang,
-                'detailHutang' => $detailHutang
+                'detailHutang' => $detailHutang,
+                'databank' => $this->bank_model->ambil_semua_data_bank()
             ];
 
             $this->load->view('templates/header', $data);
@@ -278,5 +281,174 @@ class user extends CI_Controller
         }
 
         redirect('user/pesan');
+    }
+
+    public function _uploadBuktiPembayaran($foto)
+    {
+        $config['upload_path']          = './assets/img/bukti_pembayaran/';
+        $config['allowed_types']        = 'gif|jpg|png';
+        $config['file_name']            = md5($foto['foto']['name']);
+        $config['max_size']             = 100;
+        $config['max_width']            = 1024;
+        $config['max_height']           = 768;
+
+        $this->load->library('upload', $config);
+
+        if (!$this->upload->do_upload('foto')) {
+            print $this->upload->display_errors();
+            die();
+        } else {
+            return $this->upload->data();
+        }
+    }
+
+    public function simpanPembayaran()
+    {
+        $this->load->model('penghutang_model');
+        $this->load->model('pembayaran_model');
+
+        $id_hutang = $this->input->post('id_hutang');
+
+        // Simpan Bukti Pembayaran
+        $data = [
+            "nama_pengirim" => $this->input->post('nama_pengirim'),
+            "nomor_rekening" => $this->input->post('nomor_rekening'),
+            "bank_pengirim" => $this->input->post('bank_pengirim'),
+            "id_bank" => $this->input->post('id_bank'),
+            "status_pembayaran" => "Menunggu Verifikasi"
+        ];
+
+        $id_pembayaran = 0;
+
+        if (!empty($_FILES['foto']['name'])) {
+            $upload = $this->_uploadBuktiPembayaran($_FILES);
+
+            if ($upload) {
+
+                $data['foto_bukti_pembayaran'] = $upload['file_name'];
+
+                $id_pembayaran = $this->pembayaran_model->simpan_pembayaran($data);
+            } else {
+                $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal mengunggah bukti pembayaran :(</div>');
+                redirect('user/hutang/' . $id_hutang);
+            }
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Harus memasukkan foto!</div>');
+            redirect('user/hutang/' . $id_hutang);
+        }
+
+        $dataDetailHutang = [
+            'id_hutang' => $id_hutang,
+            'total_bayar_hutang' => $this->input->post('total_bayar'),
+            'tanggal_bayar_hutang' => date('Y-m-d'),
+            'id_pembayaran' => $id_pembayaran
+        ];
+
+        $proses = $this->penghutang_model->tambah_detail_hutang($dataDetailHutang);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menambahkan bayaran hutang!</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal menambahkan bayaran hutang!</div>');
+        }
+
+        redirect('user/hutang/' . $id_hutang);
+    }
+
+    public function ubahPembayaran()
+    {
+        $this->load->model('penghutang_model');
+        $this->load->model('pembayaran_model');
+
+        $id_detail_hutang = $this->input->post('id_detail_hutang');
+        $satuDetailHutang = $this->penghutang_model->ambil_satu_detail_hutang($id_detail_hutang);
+
+        $id_hutang = $this->input->post('id_hutang');
+        $id_pembayaran = $satuDetailHutang['id_pembayaran'];
+
+        // Simpan Bukti Pembayaran
+        $data = [
+            "nama_pengirim" => $this->input->post('nama_pengirim'),
+            "nomor_rekening" => $this->input->post('nomor_rekening'),
+            "bank_pengirim" => $this->input->post('bank_pengirim'),
+            "id_bank" => $this->input->post('id_bank'),
+            "status_pembayaran" => "Menunggu Verifikasi"
+        ];
+
+        if (!empty($_FILES['foto']['name'])) {
+            $upload = $this->_uploadBuktiPembayaran($_FILES);
+            if ($upload) {
+                $data['foto_bukti_pembayaran'] = $upload['file_name'];
+            } else {
+                $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal mengunggah bukti pembayaran :(</div>');
+                redirect('user/hutang/' . $id_hutang);
+            }
+        }
+        
+        $this->pembayaran_model->ubah_pembayaran($data, $id_detail_hutang);
+
+        $dataDetailHutang = [
+            'id_hutang' => $id_hutang,
+            'total_bayar_hutang' => $this->input->post('total_bayar'),
+            'tanggal_bayar_hutang' => date('Y-m-d'),
+            'id_pembayaran' => $id_pembayaran
+        ];
+
+        $proses = $this->penghutang_model->ubah_detail_hutang($dataDetailHutang, $id_detail_hutang);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil mengubah bayaran hutang!</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal mengubah bayaran hutang!</div>');
+        }
+
+        redirect('user/hutang/' . $id_hutang);
+    }
+
+    public function hapusPembayaran($id_detail_hutang)
+    {
+        $this->load->model('penghutang_model');
+        $this->load->model('pembayaran_model');
+
+        $satuDetailHutang = $this->penghutang_model->ambil_satu_detail_hutang($id_detail_hutang);
+        $id_hutang = $satuDetailHutang['id_hutang'];
+        $id_pembayaran = $satuDetailHutang['id_pembayaran'];
+        $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
+
+        $proses = $this->penghutang_model->hapus_detail_hutang($id_detail_hutang);
+
+        $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
+        $jumlahBayar = count($detailHutang);
+
+        if ($jumlahBayar == 0) {
+            $data = [
+                'status_hutang' => 'Belum lunas'
+            ];
+        } else {
+            $totalDibayar = 0;
+
+            foreach ($detailHutang as $dh) :
+                $totalDibayar += $dh['total_bayar_hutang'];
+            endforeach;
+
+            if ($totalDibayar >= $hutang['jumlah_hutang']) {
+                $data = [
+                    'status_hutang' => 'Lunas'
+                ];
+            } else {
+                $data = [
+                    'status_hutang' => 'Sedang dicicil'
+                ];
+            }
+        }
+
+        $this->penghutang_model->update_hutang($id_hutang, $data);
+        $this->pembayaran_model->hapus_pembayaran($id_pembayaran);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menghapus bayaran hutang!</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Gagal menghapus bayaran hutang!</div>');
+        }
     }
 }
