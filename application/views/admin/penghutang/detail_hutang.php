@@ -26,7 +26,7 @@
                 </tr>
                 <tr>
                     <th width="30%"><strong>Jumlah</strong></th>
-                    <td>Rp<?php echo $hutang['jumlah_hutang']; ?>-,</td>
+                    <td>Rp. <?php echo $hutang['jumlah_hutang']; ?>-,</td>
                 </tr>
                 <tr>
                     <th width="30%"><strong>Tanggal</strong></th>
@@ -47,14 +47,6 @@
     <h1 class="h3 mb-4 text-gray-800">Riwayat Bayar Hutang</h1>
 
     <div class="card shadow mb-4">
-        <?php
-
-        if ($hutang['status_hutang'] != "Lunas") {
-        ?>
-            <div class="card-header">
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#tambahModal">Tambah Bayar</button>
-            </div>
-        <?php } ?>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered" id="tabel-data-hutang" width="100%" cellspacing="0">
@@ -63,6 +55,7 @@
                             <th scope="col">No</th>
                             <th scope="col">Total</th>
                             <th scope="col">Tanggal</th>
+                            <th scope="col">Status Pembayaran</th>
                             <th scope="col">Aksi</th>
                         </tr>
                     </thead>
@@ -74,13 +67,15 @@
                         ?>
                             <tr>
                                 <td><?= $no++ ?></td>
-                                <td>Rp<?= $dh['total_bayar_hutang'] ?>-,</td>
+                                <td>Rp. <?= number_format($dh['total_bayar_hutang']) ?>-,</td>
                                 <td><?= $dh['tanggal_bayar_hutang'] ?></td>
+                                <td><?= $dh['status_pembayaran'] ?></td>
                                 <td class="text-right">
                                     <?php
 
                                     if ($hutang['status_hutang'] != "Lunas") {
                                     ?>
+                                        <button class="btn btn-primary" data-toggle="modal" data-target="#ubahBayarModal-<?= $dh['id_detail_hutang'] ?>">Perbarui</button>
                                         <a href="<?= base_url('admin/hapus_detail_hutang/' . $dh['id_detail_hutang']) ?>" onclick="return confirm('Apakah kamu yakin ingin menghapus?');" class="btn btn-danger">Hapus</a>
                                     <?php } else { ?>
                                         <button type="button" class="btn btn-danger" disabled>Hapus</button>
@@ -99,33 +94,65 @@
 
 </div>
 
-
-<div class="modal fade" id="tambahModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Bayar Hutang</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+<?php foreach ($detailHutang as $detail) : ?>
+    <div class="modal fade" tabindex="-1" id="ubahBayarModal-<?= $detail['id_detail_hutang'] ?>">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bayar</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="<?= base_url('admin/perbaruiPembayaran') ?>" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="id_detail_hutang" value="<?= $detail['id_detail_hutang'] ?>">
+                    <input type="hidden" name="id_hutang" value="<?= $detail['id_hutang'] ?>">
+                    <div class="modal-body">
+                        <table class="table table-striped">
+                            <tr>
+                                <th width="30%"><strong>Nama Bank Pengirim</strong></th>
+                                <td><?= $detail['bank_pengirim'] ?></td>
+                            </tr>
+                            <tr>
+                                <th width="30%"><strong>Nama Pemilik Rekening</strong></th>
+                                <td><?= $detail['nama_pengirim'] ?></td>
+                            </tr>
+                            <tr>
+                                <th width="30%"><strong>No Rekening</strong></th>
+                                <td><?= $detail['nomor_rekening'] ?></td>
+                            </tr>
+                            <tr>
+                                <th width="30%"><strong>Bank Tujuan</strong></th>
+                                <td>
+                                    <?php foreach ($databank as $db) :
+                                        if ($detail['id_bank'] == $db['id_bank']) {
+                                            echo $db['nama_bank'] . "(" . $db['rekening_bank'] . ") a/n " . $db['nama_pemilik_bank'];
+                                        }
+                                    endforeach; ?>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th width="30%"><strong>Total Pembayaran</strong></th>
+                                <td>Rp. <?= number_format($detail['total_bayar_hutang']) ?></td>
+                            </tr>
+                            <tr>
+                                <th width="30%"><strong>Status Pembayaran</strong></th>
+                                <td>
+                                    <select name="status_pembayaran" class="form-control">
+                                        <option value="Menunggu Verifikasi" <?php if ($detail['status_pembayaran'] == 'Menunggu Verifikasi') { echo 'selected'; } ?>>Menunggu Verifikasi</option>
+                                        <option value="Terverifikasi" <?php if ($detail['status_pembayaran'] == 'Terverifikasi') { echo 'selected'; } ?>>Terverifikasi</option>
+                                        <option value="Tidak Valid" <?php if ($detail['status_pembayaran'] == 'Tidak Valid') { echo 'selected'; } ?>>Tidak Valid</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
             </div>
-            <form action="<?= base_url('admin/tambahDetailHutang'); ?>" method="POST">
-                <input type="hidden" name="id_hutang" value="<?= $hutang['id_hutang'] ?>">
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label>Total Bayar</label>
-                        <input type="text" class="form-control" name="total_bayar">
-                    </div>
-                    <div class="form-group">
-                        <label>Tanggal Bayar</label>
-                        <input type="date" class="form-control" name="tanggal_bayar">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
-                    <button type="submit" class="btn btn-success">Tambah</button>
-                </div>
-            </form>
         </div>
     </div>
-</div>
+<?php endforeach ?>

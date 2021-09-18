@@ -8,6 +8,11 @@ class Pembayaran_model extends CI_Model
         $this->db->insert('bukti_pembayaran', $data);
         return $this->db->insert_id();
     }
+
+    public function ambil_satu_pembayaran($id)
+    {
+        return $this->db->get_where('bukti_pembayaran', ['id_pembayaran' => $id])->result_array();
+    }
     
     public function ubah_pembayaran($data, $id)
     {
