@@ -408,4 +408,65 @@ class admin extends CI_Controller
 
         redirect('admin/pesan');
     }
+
+    public function bank()
+    {
+        $this->load->model('bank_model');
+
+        $user = $this->user;
+
+        $data = [
+            'title' => 'Data Bank',
+            'user' => $user,
+            'databank' => $this->bank_model->ambil_semua_data_bank()
+        ];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('templates/sidebar', $data);
+        $this->load->view('templates/topbar', $data);
+        $this->load->view('admin/bank', $data);
+        $this->load->view('templates/footer');
+    }
+
+    public function tambahBank()
+    {
+        $this->load->model('bank_model');
+        $data = [
+            'nama_bank' => $this->input->post('nama_bank'),
+            'nama_pemilik_bank' => $this->input->post('nama_pemilik_bank'),
+            'rekening_bank' => $this->input->post('rekening_bank')
+        ];
+
+        $proses = $this->bank_model->tambah_bank($data);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menambahkan bank.</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Bank gagal ditambahkan.</div>');
+        }
+
+        redirect('admin/bank');
+    }
+    
+    public function ubahBank()
+    {
+        $this->load->model('bank_model');
+        $data = [
+            'nama_bank' => $this->input->post('nama_bank'),
+            'nama_pemilik_bank' => $this->input->post('nama_pemilik_bank'),
+            'rekening_bank' => $this->input->post('rekening_bank')
+        ];
+
+        $id = $this->input->post('id');
+
+        $proses = $this->bank_model->ubah_bank($data, $id);
+
+        if ($proses) {
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil mengubah bank.</div>');
+        } else {
+            $this->session->set_flashdata('message', '<div class="alert alert-danger" role="alert">Bank gagal diubah.</div>');
+        }
+
+        redirect('admin/bank');
+    }
 }
