@@ -123,7 +123,8 @@
 <script>
     let dataBank
         listBankTambahData = document.getElementById("listBankTambahData")
-        listBankUbahData = document.getElementById("listBankUbahData")
+        listBankUbahData = document.querySelectorAll("#listBankUbahData")
+        listBankUbahDataArray = [...listBankUbahData]
 
     fetch("<?= base_url('assets/bank.json') ?>")
         .then(res => res.json())
@@ -137,12 +138,14 @@
                 listBankTambahData.appendChild(option)
             }
             
-            for (let i = 0; i < panjangData; i++) {
-                let option = document.createElement("option");
-                option.text = data[i].name;
-                option.value = data[i].name;
-                listBankUbahData.appendChild(option)
-            }
+            listBankUbahDataArray.forEach(sel => {
+                for (let i = 0; i < panjangData; i++) {
+                    let option = document.createElement("option");
+                    option.text = data[i].name;
+                    option.value = data[i].name;
+                    sel.appendChild(option)
+                }
+            })
         })
         .catch(err => {
             console.log(err)
