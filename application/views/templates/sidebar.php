@@ -27,6 +27,11 @@
                 <span>Penghutang</span></a>
         </li>
         <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('admin/bank'); ?>">
+                <i class="fas fa-fw fa-landmark"></i>
+                <span>Bank</span></a>
+        </li>
+        <li class="nav-item">
             <a class="nav-link" href="<?= base_url('admin/pesan'); ?>">
                 <i class="fas fa-fw fa-comments"></i>
                 <span>Pesan</span></a>
