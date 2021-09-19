@@ -217,11 +217,11 @@ class admin extends CI_Controller
 
         $this->pembayaran_model->ubah_pembayaran($statusPembayaran, $id_pembayaran);
 
-
         if ($statusPembayaran['status_pembayaran'] == "Terverifikasi") {
 
             if ($jumlahBayar > 0) {
-                $totalDibayar = 0;
+                $totalDibayar = !empty($this->input->post('total_bayar')) ? $this->input->post('total_bayar') : 0;
+                $bayar = $totalDibayar;
 
                 foreach ($detailHutang as $dh) :
                     $totalDibayar += $dh['total_bayar_hutang'];
@@ -229,7 +229,7 @@ class admin extends CI_Controller
 
                 $dataDetailHutang = [
                     'id_hutang' => $id_hutang,
-                    'total_bayar_hutang' => $total_bayar
+                    'total_bayar_hutang' => $bayar
                 ];
 
                 $proses = $this->penghutang_model->ubah_detail_hutang($dataDetailHutang, $id_detail_hutang);
@@ -244,7 +244,7 @@ class admin extends CI_Controller
                     }
                 }
             } else {
-                $totalDibayar = $total_bayar;
+                $totalDibayar = !empty($this->input->post('total_bayar')) ? $this->input->post('total_bayar') : $total_bayar;
                 $dataDetailHutang = [
                     'id_hutang' => $id_hutang,
                     'total_bayar_hutang' => $totalDibayar,
@@ -275,17 +275,26 @@ class admin extends CI_Controller
             $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">Berhasil menyimpan bayaran hutang!</div>');
             redirect('admin/detailHutang/' . $id_hutang);
         }
-
     }
 
     public function tambahDetailHutang()
     {
         $this->load->model('penghutang_model');
+        $this->load->model('pembayaran_model');
 
         $id_hutang = $this->input->post('id_hutang');
         $hutang = $this->penghutang_model->ambil_info_hutang($id_hutang);
         $detailHutang = $this->penghutang_model->ambil_detail_hutang($id_hutang);
         $jumlahBayar = count($detailHutang);
+
+        $pembayaran = [
+            "nama_pengirim" => "Bayar di tempat",
+            "nomor_rekening" => "Bayar di tempat",
+            "bank_pengirim" => "Bayar di tempat",
+            "status_pembayaran" => "Terverifikasi"
+        ];
+
+        $id_pembayaran = $this->pembayaran_model->simpan_pembayaran($pembayaran);
 
         if ($jumlahBayar > 0) {
             $totalDibayar = 0;
@@ -297,7 +306,8 @@ class admin extends CI_Controller
             $dataDetailHutang = [
                 'id_hutang' => $id_hutang,
                 'total_bayar_hutang' => $this->input->post('total_bayar'),
-                'tanggal_bayar_hutang' => $this->input->post('tanggal_bayar')
+                'tanggal_bayar_hutang' => $this->input->post('tanggal_bayar'),
+                'id_pembayaran' => $id_pembayaran
             ];
 
             $proses = $this->penghutang_model->tambah_detail_hutang($dataDetailHutang);
@@ -316,7 +326,8 @@ class admin extends CI_Controller
             $dataDetailHutang = [
                 'id_hutang' => $id_hutang,
                 'total_bayar_hutang' => $totalDibayar,
-                'tanggal_bayar_hutang' => $this->input->post('tanggal_bayar')
+                'tanggal_bayar_hutang' => $this->input->post('tanggal_bayar'),
+                'id_pembayaran' => $id_pembayaran
             ];
 
             $proses = $this->penghutang_model->tambah_detail_hutang($dataDetailHutang);
