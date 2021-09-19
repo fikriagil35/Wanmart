@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 18, 2021 at 08:41 PM
+-- Generation Time: Sep 19, 2021 at 12:09 PM
 -- Server version: 8.0.26-0ubuntu0.20.04.2
 -- PHP Version: 7.4.3
 
@@ -51,11 +51,11 @@ INSERT INTO `bank` (`id_bank`, `nama_bank`, `nama_pemilik_bank`, `rekening_bank`
 CREATE TABLE `bukti_pembayaran` (
   `id_pembayaran` int NOT NULL,
   `nama_pengirim` varchar(25) NOT NULL,
-  `nomor_rekening` varchar(12) NOT NULL,
+  `nomor_rekening` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `bank_pengirim` varchar(15) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `id_bank` int NOT NULL,
+  `id_bank` int DEFAULT NULL,
   `status_pembayaran` enum('Menunggu Verifikasi','Terverifikasi','Tidak Valid') CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `foto_bukti_pembayaran` varchar(255) NOT NULL
+  `foto_bukti_pembayaran` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
@@ -64,7 +64,30 @@ CREATE TABLE `bukti_pembayaran` (
 
 INSERT INTO `bukti_pembayaran` (`id_pembayaran`, `nama_pengirim`, `nomor_rekening`, `bank_pengirim`, `id_bank`, `status_pembayaran`, `foto_bukti_pembayaran`) VALUES
 (1, 'Bejir berug', '123412', 'BANK MANDIRI', 1, 'Terverifikasi', 'fd929618e4853b29dad676e8d0f01c281.png'),
-(2, 'Hadeh', '123121', 'BANK BRI', 1, 'Terverifikasi', 'aefb1745c6484b6704107d2e252a0ff1.png');
+(2, 'Hadeh', '123121', 'BANK BRI', 1, 'Terverifikasi', 'aefb1745c6484b6704107d2e252a0ff1.png'),
+(3, 'Bayar di tempat', 'Bayar di tem', 'Bayar di tempat', NULL, 'Terverifikasi', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `data_diri_penghutang`
+--
+
+CREATE TABLE `data_diri_penghutang` (
+  `id_data_diri` int NOT NULL,
+  `id_user` int NOT NULL,
+  `nik` varchar(16) NOT NULL,
+  `penghasilan_perbulan` int NOT NULL,
+  `nomor_wa` varchar(13) NOT NULL,
+  `alamat` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `data_diri_penghutang`
+--
+
+INSERT INTO `data_diri_penghutang` (`id_data_diri`, `id_user`, `nik`, `penghasilan_perbulan`, `nomor_wa`, `alamat`) VALUES
+(1, 6, '1234567891023457', 3000000, '081234567892', 'Jalan Gangnam nomer 69 di Korea');
 
 -- --------------------------------------------------------
 
@@ -86,7 +109,8 @@ CREATE TABLE `detail_hutang` (
 
 INSERT INTO `detail_hutang` (`id_detail_hutang`, `id_hutang`, `id_pembayaran`, `total_bayar_hutang`, `tanggal_bayar_hutang`) VALUES
 (1, 6, 1, 400, '2021-09-18'),
-(2, 6, 2, 100, '2021-09-18');
+(2, 6, 2, 0, '2021-09-18'),
+(3, 6, 3, 100, '2021-09-19');
 
 -- --------------------------------------------------------
 
@@ -196,7 +220,8 @@ CREATE TABLE `user` (
 INSERT INTO `user` (`id_user`, `name_user`, `email_user`, `image_user`, `password_user`, `role_id_user`, `is_active_user`, `date_created_user`) VALUES
 (1, 'Fikri Agiel', 'fiqriagil35@gmail.com', 'Quote-Pahlawan.jpg', '$2y$10$LA0SD04XHvwOnkLygvq6LOzL3Mpp/S75edGXxUzvqQMNg1/E3tbAS', 1, 1, 1602912429),
 (4, 'Udin', 'udin123@gmail.com', 'hari-pahlawan-533x261.png', '$2y$10$yXoKEK8x3R6pLYTaHeR6iuap.enR.UhQCpM54yzaEVeJTNB7ov/VC', 2, 1, 1606903556),
-(5, 'Jacobus Hans Gradiyantod', 'jack123@gmail.com', 'kepalan_2.png', '$2y$10$NX/BapnRFyTVCzK/UI1MsOoUtfie64J8WDhSuZu8CnMCwIvdexSNq', 2, 1, 1623252124);
+(5, 'Jacobus Hans Gradiyantod', 'jack123@gmail.com', 'kepalan_2.png', '$2y$10$NX/BapnRFyTVCzK/UI1MsOoUtfie64J8WDhSuZu8CnMCwIvdexSNq', 2, 1, 1623252124),
+(6, 'Jeongyeon', 'jeongyeon@cakep.com', 'default.jpg', '$2y$10$dyTt2WiaodvRqUmMpUVvo.OT4YlnUh1kdD4qeGFnW9siTG3Dw5N5S', 2, 1, 1632024083);
 
 --
 -- Indexes for dumped tables
@@ -213,6 +238,12 @@ ALTER TABLE `bank`
 --
 ALTER TABLE `bukti_pembayaran`
   ADD PRIMARY KEY (`id_pembayaran`);
+
+--
+-- Indexes for table `data_diri_penghutang`
+--
+ALTER TABLE `data_diri_penghutang`
+  ADD PRIMARY KEY (`id_data_diri`);
 
 --
 -- Indexes for table `detail_hutang`
@@ -258,13 +289,19 @@ ALTER TABLE `bank`
 -- AUTO_INCREMENT for table `bukti_pembayaran`
 --
 ALTER TABLE `bukti_pembayaran`
-  MODIFY `id_pembayaran` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_pembayaran` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `data_diri_penghutang`
+--
+ALTER TABLE `data_diri_penghutang`
+  MODIFY `id_data_diri` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `detail_hutang`
 --
 ALTER TABLE `detail_hutang`
-  MODIFY `id_detail_hutang` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_detail_hutang` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `detail_pesan`
@@ -288,7 +325,7 @@ ALTER TABLE `pesan`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `id_user` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id_user` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
