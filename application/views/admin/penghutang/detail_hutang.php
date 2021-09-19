@@ -135,17 +135,27 @@
                                 <th width="30%"><strong>Total Pembayaran</strong></th>
                                 <td>Rp. <?= number_format($detail['total_bayar_hutang']) ?></td>
                             </tr>
-                            <tr>
-                                <th width="30%"><strong>Status Pembayaran</strong></th>
-                                <td>
-                                    <select name="status_pembayaran" class="form-control">
-                                        <option value="Menunggu Verifikasi" <?php if ($detail['status_pembayaran'] == 'Menunggu Verifikasi') { echo 'selected'; } ?>>Menunggu Verifikasi</option>
-                                        <option value="Terverifikasi" <?php if ($detail['status_pembayaran'] == 'Terverifikasi') { echo 'selected'; } ?>>Terverifikasi</option>
-                                        <option value="Tidak Valid" <?php if ($detail['status_pembayaran'] == 'Tidak Valid') { echo 'selected'; } ?>>Tidak Valid</option>
-                                    </select>
-                                </td>
-                            </tr>
                         </table>
+
+                        <div class="form-group">
+                            <label>Bukti Pembayaran</label>
+                            <img class="img-fluid rounded mx-auto d-block" src="<?= base_url('assets/img/bukti_pembayaran/') . $detail['foto_bukti_pembayaran'] ?>" alt="Bukti Pembayaran" width="100" height="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status Pembayaran</label>
+                            <select name="status_pembayaran" class="form-control">
+                                <option value="Menunggu Verifikasi" <?php if ($detail['status_pembayaran'] == 'Menunggu Verifikasi') {
+                                                                        echo 'selected';
+                                                                    } ?>>Menunggu Verifikasi</option>
+                                <option value="Terverifikasi" <?php if ($detail['status_pembayaran'] == 'Terverifikasi') {
+                                                                    echo 'selected';
+                                                                } ?>>Terverifikasi</option>
+                                <option value="Tidak Valid" <?php if ($detail['status_pembayaran'] == 'Tidak Valid') {
+                                                                echo 'selected';
+                                                            } ?>>Tidak Valid</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
