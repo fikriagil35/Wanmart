@@ -33,12 +33,42 @@ class user extends CI_Controller
         $data['title'] = 'Profil Saya';
         $data['user'] = $this->user;
         $data['notifHutang'] = $this->cekHutangDeadline();
+        $data['dataDiri'] = $this->db->get_where('data_diri_penghutang', ['id_user' => $this->user['id_user']])->row_array();
 
         $this->load->view('templates/header', $data);
         $this->load->view('templates/sidebar', $data);
         $this->load->view('templates/topbar', $data);
         $this->load->view('user/index', $data);
         $this->load->view('templates/footer');
+    }
+
+    public function updateDataDiri()
+    {
+        $this->form_validation->set_rules('nik', 'NIK', 'required|trim|exact_length[16]');
+        $this->form_validation->set_rules('penghasilan_perbulan', 'Penghasilan per bulan', 'required|trim');
+        $this->form_validation->set_rules('no_wa', 'Nomor WA', 'required|trim|numeric|min_length[10]|max_length[13]');
+        $this->form_validation->set_rules('alamat', 'Alamat rumah', 'required|trim');
+
+        $id_user = $this->user['id_user'];
+
+        if ($this->form_validation->run() == false) {
+            $this->index();
+        } else {
+            $dataDiri = [
+                'nik' => htmlspecialchars($this->input->post('nik', true)),
+                'penghasilan_perbulan' => htmlspecialchars($this->input->post('penghasilan_perbulan', true)),
+                'nomor_wa' => htmlspecialchars($this->input->post('no_wa', true)),
+                'alamat' => htmlspecialchars($this->input->post('alamat', true)),
+            ];
+
+            $this->db->where('id_user', $id_user);
+            $this->db->update('data_diri_penghutang', $dataDiri);
+
+            $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">
+            Berhasil memperbarui data diri.
+            </div>');
+            redirect('user');
+        }
     }
 
     public function hutang($id_hutang = NULL)
@@ -384,7 +414,7 @@ class user extends CI_Controller
                 redirect('user/hutang/' . $id_hutang);
             }
         }
-        
+
         $this->pembayaran_model->ubah_pembayaran($data, $id_detail_hutang);
 
         $dataDetailHutang = [
