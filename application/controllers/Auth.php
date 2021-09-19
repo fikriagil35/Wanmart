@@ -79,6 +79,10 @@ class Auth extends CI_Controller
         $this->form_validation->set_rules('email', 'Email', 'required|trim|valid_email|is_unique[user.email_user]', ['is_unique' => 'Email ini telah terdaftar!']);
         $this->form_validation->set_rules('password1', 'Password', 'required|trim|min_length[8]|matches[password2]', ['matches' => 'Password tidak sama!', 'min_length' => 'Password terlalu pendek!']);
         $this->form_validation->set_rules('password2', 'Password', 'required|trim|matches[password1]');
+        $this->form_validation->set_rules('nik', 'NIK', 'required|trim|exact_length[16]');
+        $this->form_validation->set_rules('penghasilan_perbulan', 'Penghasilan per bulan', 'required|trim');
+        $this->form_validation->set_rules('no_wa', 'Nomor WA', 'required|trim|numeric|min_length[10]|max_length[13]');
+        $this->form_validation->set_rules('alamat', 'Alamat rumah', 'required|trim');
 
         if ($this->form_validation->run() == false) {
             $data['title'] = 'Halaman Registrasi';
@@ -97,6 +101,19 @@ class Auth extends CI_Controller
             ];
 
             $this->db->insert('user', $data);
+
+            $id_user = $this->db->insert_id();
+
+            $dataDiri = [
+                'id_user' => $id_user,
+                'nik' => htmlspecialchars($this->input->post('nik', true)),
+                'penghasilan_perbulan' => htmlspecialchars($this->input->post('penghasilan_perbulan', true)),
+                'nomor_wa' => htmlspecialchars($this->input->post('no_wa', true)),
+                'alamat' => htmlspecialchars($this->input->post('alamat', true)),
+            ];
+
+            $this->db->insert('data_diri_penghutang', $dataDiri);
+
             $this->session->set_flashdata('message', '<div class="alert alert-success" role="alert">
             Selamat! Akun anda berhasil dibuat. Silahkan Login!
           </div>');
